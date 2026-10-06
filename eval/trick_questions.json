@@ -1,0 +1,91 @@
+{
+  "pinned": {
+    "hyperswitch": "d03f8547d6367fab56690e4f5043590be4935dcd",
+    "active_merchant": "ca45b1b063ce2e1495e1427e0a1d42dcb482d57d"
+  },
+  "index_chunks": 2397,
+  "trick_questions": [
+    {
+      "id": "T1",
+      "repo": "hyperswitch",
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "absent_terms": [
+        "sanction",
+        "\\bofac\\b",
+        "embargo",
+        "blocklist",
+        "denylist",
+        "blocked_countries|restricted_countries"
+      ],
+      "verified_counts": {
+        "sanction": 0,
+        "\\bofac\\b": 0,
+        "embargo": 0,
+        "blocklist": 0,
+        "denylist": 0,
+        "blocked_countries|restricted_countries": 0
+      }
+    },
+    {
+      "id": "T2",
+      "repo": "active_merchant",
+      "question": "What identity verification (KYC) does the Stripe gateway in active_merchant require before accepting a payment?",
+      "absent_terms": [
+        "\\bkyc\\b",
+        "identity[_ ]verif"
+      ],
+      "verified_counts": {
+        "\\bkyc\\b": 0,
+        "identity[_ ]verif": 0
+      }
+    },
+    {
+      "id": "T3",
+      "repo": "active_merchant",
+      "question": "Does active_merchant restrict card payments in EU countries for GDPR reasons?",
+      "absent_terms": [
+        "gdpr"
+      ],
+      "verified_counts": {
+        "gdpr": 0
+      }
+    },
+    {
+      "id": "T4",
+      "repo": "hyperswitch",
+      "question": "Which countries can pay with Bitcoin or other cryptocurrency through Hyperswitch?",
+      "absent_terms": [
+        "bitcoin",
+        "cryptocurrenc"
+      ],
+      "verified_counts": {
+        "bitcoin": 0,
+        "cryptocurrenc": 0
+      }
+    },
+    {
+      "id": "T5",
+      "repo": "active_merchant",
+      "question": "What is the refund time window enforced by the Stripe gateway in active_merchant?",
+      "absent_terms": [
+        "refund_window",
+        "refund_period",
+        "refund_deadline",
+        "days_to_refund"
+      ],
+      "verified_counts": {
+        "refund_window": 0,
+        "refund_period": 0,
+        "refund_deadline": 0,
+        "days_to_refund": 0
+      }
+    }
+  ],
+  "hard_near_miss": {
+    "id": "H1",
+    "repo": "active_merchant",
+    "question": "Which countries does the Paymill gateway in active_merchant block?",
+    "note": "NEAR-MISS: paymill.rb:277 only maps error code 50001 to 'Country blacklisted' (message returned by Paymill's server). No country list exists in the code. Correct behaviour: say no list is defined here, mention that the gateway can return that error.",
+    "evidence": "lib/active_merchant/billing/gateways/paymill.rb:277"
+  }
+}

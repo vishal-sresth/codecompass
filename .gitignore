@@ -1,0 +1,12 @@
+.venv/
+.env
+hyperswitch/
+repos/
+ingest/out/
+__pycache__/
+node_modules/
+.next/
+demo/results/
+logs/
+.DS_Store
+_local_archive/

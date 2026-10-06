@@ -1,0 +1,382 @@
+{
+  "agent_version": 4,
+  "results": [
+    {
+      "id": "T1",
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "verdict": "PASS",
+      "valid_json": true,
+      "n_rules": 0,
+      "n_gaps": 1,
+      "citation_checks": [],
+      "seconds": 18,
+      "tokens": {
+        "in": 35265,
+        "out": 1473
+      },
+      "answer": "I could not find a specific \u2018sanctions blocklist\u2019 in the code/config I searched. The repository contains many per-connector country lists (pm_filters) in config/deployments/production.toml, but no explicit list or rule labelled as \u2018sanctions\u2019 or \u2018sanctioned countries\u2019. If you need a definitive sanctioned-country blocklist, engineering should point to the file or service that contains the sanctions policy (it may be external to these config files).",
+      "rules": [],
+      "gaps": [
+        {
+          "looked_in": [
+            "config/deployments/production.toml (pm_filters sections such as [pm_filters.nmi])",
+            "config/config.example.toml (pm_filters examples)"
+          ],
+          "not_found": "I did not find any file or section that explicitly lists the countries Hyperswitch blocks for \u2018sanctions\u2019 reasons (no entry named 'sanctions', 'sanctioned', 'sanctions_list', or equivalent). The files do contain many per-connector allowed/blocked country lists (pm_filters) but none are labelled as a global sanctions blocklist or policy.",
+          "suggested_follow_up": "Ask engineering or compliance: (1) which file or service holds the sanctioned-country blocklist (if maintained separately from these configs), (2) whether sanctions are enforced in code (and where), or (3) whether an external sanctions screening provider is used and where that integration is configured."
+        }
+      ],
+      "raw": null
+    },
+    {
+      "id": "T2",
+      "question": "What identity verification (KYC) does the Stripe gateway in active_merchant require before accepting a payment?",
+      "verdict": "FAIL",
+      "valid_json": true,
+      "n_rules": 3,
+      "n_gaps": 1,
+      "citation_checks": [
+        {
+          "rule": "Direct bank account (ACH) transactions are not allowed for authorize; bank accounts must be stored a",
+          "checks": [
+            [
+              true,
+              "evidence text found"
+            ]
+          ]
+        },
+        {
+          "rule": "Storing a Check (bank account) tokenizes the bank account via Stripe tokens API before adding it as ",
+          "checks": [
+            [
+              true,
+              "evidence text found"
+            ],
+            [
+              true,
+              "evidence text found"
+            ]
+          ]
+        },
+        {
+          "rule": "verify(payment, ...) runs an authorization for the gateway's auth_minimum_amount and then voids it (",
+          "checks": [
+            [
+              false,
+              "evidence NOT on those lines"
+            ],
+            [
+              true,
+              "evidence text found"
+            ]
+          ]
+        }
+      ],
+      "seconds": 19,
+      "tokens": {
+        "in": 29830,
+        "out": 1865
+      },
+      "answer": "The Stripe gateway in this codebase does not implement a separate identity-document KYC flow. Instead the code enforces (1) bank (ACH) accounts must be tokenized/stored and verified before they can be used (direct ACH payments for purchase/authorize are rejected), and (2) the generic verify() flow performs a small authorization (the gateway's auth_minimum_amount) and then voids it to verify a payment method.",
+      "rules": [
+        {
+          "rule": "Direct bank account (ACH) transactions are not allowed for authorize; bank accounts must be stored and verified before use.",
+          "category": "technical",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/stripe.rb",
+              "line_start": 105,
+              "line_end": 108,
+              "evidence": "if ach?(payment)\n          direct_bank_error = 'Direct bank account transactions are not supported. Bank accounts must be stored and verified before use.'\n          return Response.new(false, direct_bank_error)\n        end"
+            }
+          ],
+          "reasoning": "The purchase/authorize path explicitly rejects ACH payment objects with that error message, which enforces that bank accounts cannot be used directly and must instead be stored/verified first."
+        },
+        {
+          "rule": "Storing a Check (bank account) tokenizes the bank account via Stripe tokens API before adding it as a source.",
+          "category": "technical",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/stripe.rb",
+              "line_start": 186,
+              "line_end": 191,
+              "evidence": "if payment.is_a?(Check)\n          bank_token_response = tokenize_bank_account(payment)\n          return bank_token_response unless bank_token_response.success?\n\n          params = { source: bank_token_response.params['token']['id'] }"
+            },
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/stripe.rb",
+              "line_start": 824,
+              "line_end": 831,
+              "evidence": "token_response = api_request(:post, \"tokens?#{post_data(post)}\")\n        success = token_response['error'].nil?\n\n        if success && token_response['id']\n          Response.new(success, nil, token: token_response)"
+            }
+          ],
+          "reasoning": "The store() path for Check calls tokenize_bank_account which posts bank_account data to the tokens endpoint and returns a token response used as the source, indicating the gateway relies on tokenization as part of preparing bank accounts for use."
+        },
+        {
+          "rule": "verify(payment, ...) runs an authorization for the gateway's auth_minimum_amount and then voids it (auth-then-void) to verify the payment method.",
+          "category": "technical",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/stripe.rb",
+              "line_start": 167,
+              "line_end": 172,
+              "evidence": "def verify(payment, options = {})\n        MultiResponse.run(:use_first_response) do |r|\n          r.process { authorize(auth_minimum_amount(options), payment, options) }\n          options[:idempotency_key] = nil\n          r.process(:ignore_result) { void(r.authorization, options) }\n        end\n      end"
+            },
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/stripe.rb",
+              "line_start": 843,
+              "line_end": 847,
+              "evidence": "def auth_minimum_amount(options)\n        return 100 unless options[:currency]\n\n        return MINIMUM_AUTHORIZE_AMOUNTS[options[:currency].upcase] || 100\n      end"
+            }
+          ],
+          "reasoning": "The verify method explicitly authorizes the auth_minimum_amount and then voids that authorization, implementing a classic small-auth verification instead of a separate identity/KYC check."
+        }
+      ],
+      "gaps": [
+        {
+          "looked_in": [
+            "lib/active_merchant/billing/gateways/stripe.rb (store, purchase, authorize, verify, tokenize_bank_account, auth_minimum_amount)"
+          ],
+          "not_found": "No code in the Stripe gateway file requires submitting identity documents (IDs, passports) or performing KYC checks for a merchant or customer identity. There is no explicit \u2018KYC\u2019 or identity-document verification flow in this file.",
+          "suggested_follow_up": "Ask engineering where Stripe Connect account-level KYC (if used) is handled (it may be performed outside this gateway class, e.g., during Connect onboarding or in a different part of the system). Also confirm whether bank-account verification (micro-deposits or instant verification) is handled by Stripe automatically after tokenize_bank_account or by another module."
+        }
+      ],
+      "raw": null
+    },
+    {
+      "id": "T3",
+      "question": "Does active_merchant restrict card payments in EU countries for GDPR reasons?",
+      "verdict": "FAIL",
+      "valid_json": true,
+      "n_rules": 2,
+      "n_gaps": 1,
+      "citation_checks": [
+        {
+          "rule": "AirwallexGateway declares that \"cards are accepted in all EU countries\" and lists EU country codes i",
+          "checks": [
+            [
+              false,
+              "evidence NOT on those lines"
+            ]
+          ]
+        },
+        {
+          "rule": "Configuration pm_filters include EU country codes for credit (card) payment support (example from de",
+          "checks": [
+            [
+              false,
+              "evidence NOT on those lines"
+            ]
+          ]
+        }
+      ],
+      "seconds": 17,
+      "tokens": {
+        "in": 16645,
+        "out": 1673
+      },
+      "answer": "I did not find any code in the searched files that blocks or restricts card payments in EU countries for GDPR reasons. Gateways and configuration files explicitly list EU countries as supported for card payments (for example Airwallex and several pm_filters), and there is no GDPR-based denylist or comment in the returned results stating card payments are disabled in EU countries.",
+      "rules": [
+        {
+          "rule": "AirwallexGateway declares that \"cards are accepted in all EU countries\" and lists EU country codes in supported_countries.",
+          "category": "commercial",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/airwallex.rb",
+              "line_start": 7,
+              "line_end": 8,
+              "evidence": " 7 |       # per https://www.airwallex.com/docs/online-payments__overview, cards are accepted in all EU countries\n 8 |       self.supported_countries = %w[AT AU BE BG CY CZ DE DK EE GR ES FI FR GB HK HR HU IE IT LT LU LV MT NL PL PT RO SE SG SI SK]"
+            }
+          ],
+          "reasoning": "The comment explicitly states cards are accepted in all EU countries and the supported_countries array contains EU country codes, so this gateway does not restrict EU card usage."
+        },
+        {
+          "rule": "Configuration pm_filters include EU country codes for credit (card) payment support (example from development.toml: stripe credit includes many EU countries).",
+          "category": "technical",
+          "citations": [
+            {
+              "repo": "hyperswitch",
+              "file": "config/development.toml",
+              "line_start": 650,
+              "line_end": 652,
+              "evidence": "650 | apple_pay = { country = \"AU, AT, BE, BR, BG, CA, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, HK, IE, IT, LV, LI, LT, LU, MT, MY, MX, NL, NZ, NO, PL, PT, RO, SK, SG, SI, ES, SE, CH, GB, AE, US\" }\n651 | klarna = { country = \"AU,AT,BE,CA,CZ,DK,FI,FR,DE,GR,IE,IT,NL,NZ,NO,PL,PT,ES,SE,CH,GB,US\", currency = \"AUD,CAD,CHF,CZK,DKK,EUR,GBP,NOK,NZD,PLN,SEK,USD\" }\n652 | credit = { country = \"AF,AX,AL,DZ,AS,AD,AO,AI,AQ,AG,AR,AM,AW,AU,AT,AZ,BS,BH,BD,BB,BY,BE,BZ,BJ,BM,BT,BO,BQ,BA,BW,BV,BR,IO,BN,BG,BF,BI,KH,CM,CA,CV,KY,CF,TD,CL,CN,CX,CC,CO,KM,CG,CD,CK,CR,CI,HR,CU,CW,CY,CZ,DK,DJ,DM,DO,EC,EG,SV,GQ,ER,EE,ET,FK,FO,FJ,FI,FR,GF,PF,TF,GA,GM,GE,DE,GH,GI,GR,GL,GD,GP,GU,GT,GG,GN,GW,GY,HT,HM,VA,HN,HK,HU,IS,IN,ID,IR,IQ,IE,IM,IL,IT,JM,JP,JE,JO,KZ,KE,KI,KP,KR,KW,KG,LA,LV,LB,LS,LR,LY,LI,LT,LU,MO,MG,MW,MY,MV,ML,MT,MH,MQ,MR,MU,YT,MX,FM,MD,MC,MN,ME,MS,MA,MZ,MM,NA,NR,NP,NL,NC,NZ,NI,NE,NG,NU,NF,MP,NO,OM,PK,PW,PS,PA,PG,PY,PE,PH,PN,PL,PT,PR,QA,RE,RO,RU,RW,BL,SH,KN,LC,MF,PM,VC,WS,SM,ST,SA,SN,RS,SC,SL,SG,SX,SK,SI,SB,SO,ZA,GS,ES,LK,SD,SR,SJ,SZ,SE,CH,SY,TW,TJ,TZ,TH,TL,TG,TK,TO,TT,TN,TR,TM,TC,TV,UG,UA,AE,GB,UM,UY,UZ,VU,VE,VN,VG,VI,WF,EH,YE,ZM,ZW,US\", currency = \"AED,AFN,ALL,AMD,ANG,AOA,ARS,AUD,AWG,AZN,BAM,BBD,BDT,BGN,BHD,BIF,BMD,BND,\" }"
+            }
+          ],
+          "reasoning": "The payment method filter configuration explicitly enumerates EU country codes among supported countries for credit payments, indicating no blanket EU restriction at the config layer."
+        }
+      ],
+      "gaps": [
+        {
+          "looked_in": [
+            "lib/active_merchant/billing/gateways/*.rb files returned (airwallex.rb, stripe.rb, stripe_payment_intents.rb, reds ys.rb, redsys_rest.rb, adyen.rb, etc.)",
+            "config/development.toml and config/deployments/production.toml pm_filters snippets returned"
+          ],
+          "not_found": "Any code, comment, or configuration that explicitly states card payments are blocked or restricted in EU countries for GDPR reasons.",
+          "suggested_follow_up": "Ask engineering to point to any files not returned by the search that might implement legal/regulatory blocks (e.g., middleware, deploy-time filters, or a GDPR-specific policy module), or confirm whether any runtime policy service (outside this repo) enforces GDPR-based payment restrictions."
+        }
+      ],
+      "raw": null
+    },
+    {
+      "id": "T4",
+      "question": "Which countries can pay with Bitcoin or other cryptocurrency through Hyperswitch?",
+      "verdict": "FAIL",
+      "valid_json": true,
+      "n_rules": 2,
+      "n_gaps": 1,
+      "citation_checks": [
+        {
+          "rule": "Coinbase Commerce crypto payments are allowed for the countries: ZA, US, BR, CA, TR, SG, VN, GB, DE,",
+          "checks": [
+            [
+              true,
+              "evidence text found"
+            ]
+          ]
+        },
+        {
+          "rule": "BitPay crypto payments are allowed for the countries: US, CA, GB, AT, BE, BG, HR, CY, CZ, DK, EE, FI",
+          "checks": [
+            [
+              false,
+              "evidence NOT on those lines"
+            ]
+          ]
+        }
+      ],
+      "seconds": 16,
+      "tokens": {
+        "in": 17228,
+        "out": 1121
+      },
+      "answer": "The code contains payment-method filters for two crypto payment providers: Coinbase Commerce and BitPay. Coinbase Commerce is enabled for the specific countries listed in the coinbase pm_filter; BitPay is enabled for the countries listed in the bitpay pm_filter. I did not find any other pm_filters for \u2018crypto\u2019 or \u2018bitcoin\u2019 in the files I searched.",
+      "rules": [
+        {
+          "rule": "Coinbase Commerce crypto payments are allowed for the countries: ZA, US, BR, CA, TR, SG, VN, GB, DE, FR, ES, PT, IT, NL, AU.",
+          "category": "commercial",
+          "citations": [
+            {
+              "repo": "hyperswitch",
+              "file": "config/deployments/production.toml",
+              "line_start": 595,
+              "line_end": 596,
+              "evidence": "crypto_currency = { country = \"ZA,US,BR,CA,TR,SG,VN,GB,DE,FR,ES,PT,IT,NL,AU\" }"
+            }
+          ],
+          "reasoning": "The pm_filters.coinbase section defines a crypto_currency entry whose country field explicitly lists the allowed country codes."
+        },
+        {
+          "rule": "BitPay crypto payments are allowed for the countries: US, CA, GB, AT, BE, BG, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, IE, IT, LV, LT, LU, MT, NL, PL, PT, RO, SK, SI, ES, SE.",
+          "category": "commercial",
+          "citations": [
+            {
+              "repo": "hyperswitch",
+              "file": "config/config.example.toml",
+              "line_start": 644,
+              "line_end": 645,
+              "evidence": "[pm_filters.bitpay]\ncrypto_currency = { country = \"US, CA, GB, AT, BE, BG, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, IE, IT, LV, LT, LU, MT, NL, PL, PT, RO, SK, SI, ES, SE\", currency = \"USD, AUD, CAD, GBP, MXN, NZD, CHF, EUR\"}"
+            }
+          ],
+          "reasoning": "The pm_filters.bitpay section defines a crypto_currency entry whose country field lists the allowed country codes and also specifies supported currencies."
+        }
+      ],
+      "gaps": [
+        {
+          "looked_in": [
+            "config/config.example.toml [pm_filters.bitpay, pm_filters.coinbase]",
+            "config/deployments/production.toml [pm_filters.coinbase]",
+            "config/development.toml [pm_filters.bitpay, pm_filters.coinbase]",
+            "config/development.toml [pm_filters.* sections found in search results]"
+          ],
+          "not_found": "I did not find additional pm_filters for other crypto payment providers (for example 'opennode' or a generic 'bitcoin' pm_filter) nor a consolidated list of all crypto-capable countries. I also did not find a mapping that says which payment method (coinbase vs bitpay) supports which specific crypto coins (e.g., BTC vs ETH) beyond the generic 'crypto_currency' filter names.",
+          "suggested_follow_up": "Ask engineering which connector (Coinbase Commerce or BitPay) is used for a given merchant/region by default, and whether 'crypto_currency' here specifically includes Bitcoin (BTC) and/or other coins\u2014also request any runtime routing rules that choose between coinbase vs bitpay when both are available."
+        }
+      ],
+      "raw": null
+    },
+    {
+      "id": "T5",
+      "question": "What is the refund time window enforced by the Stripe gateway in active_merchant?",
+      "verdict": "PASS",
+      "valid_json": true,
+      "n_rules": 0,
+      "n_gaps": 1,
+      "citation_checks": [],
+      "seconds": 13,
+      "tokens": {
+        "in": 31904,
+        "out": 977
+      },
+      "answer": "I could not find any code in the Stripe gateways that enforces a refund time window (e.g. \"n days after charge\"). The Stripe gateway and Stripe Payment Intents gateway implement refund calls but do not contain a constant or check that restricts refunds by age, so there is no refund-time-window enforced in this codebase that I could find.",
+      "rules": [],
+      "gaps": [
+        {
+          "looked_in": [
+            "lib/active_merchant/billing/gateways/stripe.rb (refund implementation and related methods) - lines showing refund and refund-related behavior: lines 122-169 and 141-165, 272-326, 317-370   ",
+            "lib/active_merchant/billing/gateways/stripe_payment_intents.rb (refund wrapper for payment intents) - lines implementing refund and mapping to charges: lines 1-41 and 229-267 and 193-238   ",
+            "other gateway refund implementations (sample files searched to compare patterns) - eway_rapid.rb, mercado_pago.rb, etc. (examples returned by search)  "
+          ],
+          "not_found": "No constant, configuration option, conditional, or explicit check in the Stripe gateway or StripePaymentIntents gateway source code that enforces a maximum refund window (for example \"refunds only allowed within N days of the charge\"). The refund methods directly call Stripe refund endpoints without performing an age check on the original charge in this code.",
+          "suggested_follow_up": "Ask engineering where refund-age limits are expected to be enforced: (a) in application/business logic elsewhere in your codebase, (b) via Stripe account settings/policies (outside this repository), or (c) by Stripe's API behavior. If they expect the gateway to enforce it, request the file/path where that enforcement lives or ask them to add an explicit check (e.g. fetch the charge's created timestamp and compare to allowed window) and point to the Stripe gateway refund methods above for where to add it."
+        }
+      ],
+      "raw": null
+    },
+    {
+      "id": "H1",
+      "question": "Which countries does the Paymill gateway in active_merchant block?",
+      "verdict": "MANUAL REVIEW",
+      "valid_json": true,
+      "n_rules": 1,
+      "n_gaps": 1,
+      "citation_checks": [
+        {
+          "rule": "Paymill gateway lists its supported countries as AD AT BE BG CH CY CZ DE DK EE ES FI FO FR GB GI GR ",
+          "checks": [
+            [
+              true,
+              "evidence text found"
+            ]
+          ]
+        }
+      ],
+      "seconds": 10,
+      "tokens": {
+        "in": 16936,
+        "out": 699
+      },
+      "answer": "I found the Paymill gateway's supported countries list in the code \u2014 the gateway explicitly enumerates which countries it supports. The code does not contain a separate explicit \u201cblocked\u201d list; any country not in the supported_countries list would be unsupported by this gateway, but the code does not label those as \"blocked.\"",
+      "rules": [
+        {
+          "rule": "Paymill gateway lists its supported countries as AD AT BE BG CH CY CZ DE DK EE ES FI FO FR GB GI GR HR HU IE IL IM IS IT LI LT LU LV MC MT NL NO PL PT RO SE SI SK TR VA.",
+          "category": "technical",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/paymill.rb",
+              "line_start": 6,
+              "line_end": 8,
+              "evidence": "self.supported_countries = %w(AD AT BE BG CH CY CZ DE DK EE ES FI FO FR GB\n                                      GI GR HR HU IE IL IM IS IT LI LT LU LV MC MT\n                                      NL NO PL PT RO SE SI SK TR VA)"
+            }
+          ],
+          "reasoning": "The code sets self.supported_countries to an explicit list of ISO country codes, which determines which countries the Paymill gateway accepts in this codebase."
+        }
+      ],
+      "gaps": [
+        {
+          "looked_in": [
+            "lib/active_merchant/billing/gateways/paymill.rb (SECTION: module ActiveMerchant # :nodoc:, class PaymillGateway < Gateway)"
+          ],
+          "not_found": "An explicit 'blocked' or 'blacklist' list for Paymill; no code that labels or enumerates countries as 'blocked'.",
+          "suggested_follow_up": "Ask engineering whether unsupported countries (i.e., countries not in supported_countries) are treated as 'blocked' at runtime and whether there are any additional runtime blacklists or external filters (e.g., PM filters, config files, or gateway responses) that enforce blocking beyond this supported_countries list."
+        }
+      ],
+      "raw": null
+    }
+  ]
+}

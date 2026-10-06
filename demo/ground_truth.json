@@ -1,0 +1,229 @@
+{
+  "repo": "juspay/hyperswitch",
+  "rules": [
+    {
+      "id": "R1",
+      "question": "Where can we offer Affirm through Stripe, and in which currency?",
+      "connector": "stripe",
+      "payment_method": "affirm",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "file": "config/development.toml",
+      "line": 654
+    },
+    {
+      "id": "R2",
+      "question": "Which countries and currencies is Cash App Pay available in on Stripe?",
+      "connector": "stripe",
+      "payment_method": "cashapp",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "file": "config/development.toml",
+      "line": 656
+    },
+    {
+      "id": "R3",
+      "question": "Where is EPS available on Stripe?",
+      "connector": "stripe",
+      "payment_method": "eps",
+      "countries": [
+        "AT"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "file": "config/development.toml",
+      "line": 657
+    },
+    {
+      "id": "R4",
+      "question": "Why can't we use Giropay on Stripe outside Germany?",
+      "connector": "stripe",
+      "payment_method": "giropay",
+      "countries": [
+        "DE"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "file": "config/development.toml",
+      "line": 658
+    },
+    {
+      "id": "R5",
+      "question": "Which countries can use iDEAL on Stripe?",
+      "connector": "stripe",
+      "payment_method": "ideal",
+      "countries": [
+        "NL"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "file": "config/development.toml",
+      "line": 659
+    },
+    {
+      "id": "R6",
+      "question": "Why is Klarna on Stripe available in Germany but not in India?",
+      "connector": "stripe",
+      "payment_method": "klarna",
+      "countries": [
+        "AU",
+        "AT",
+        "BE",
+        "CA",
+        "CZ",
+        "DK",
+        "FI",
+        "FR",
+        "DE",
+        "GR",
+        "IE",
+        "IT",
+        "NL",
+        "NZ",
+        "NO",
+        "PL",
+        "PT",
+        "ES",
+        "SE",
+        "CH",
+        "GB",
+        "US"
+      ],
+      "currencies": [
+        "AUD",
+        "CAD",
+        "CHF",
+        "CZK",
+        "DKK",
+        "EUR",
+        "GBP",
+        "NOK",
+        "NZD",
+        "PLN",
+        "SEK",
+        "USD"
+      ],
+      "file": "config/development.toml",
+      "line": 651
+    },
+    {
+      "id": "R7",
+      "question": "Where is MB Way available on Adyen?",
+      "connector": "adyen",
+      "payment_method": "mb_way",
+      "countries": [
+        "PT"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "file": "config/development.toml",
+      "line": 716
+    },
+    {
+      "id": "R8",
+      "question": "Which countries and currencies does PayBright on Adyen support?",
+      "connector": "adyen",
+      "payment_method": "pay_bright",
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ],
+      "file": "config/development.toml",
+      "line": 720
+    },
+    {
+      "id": "R9",
+      "question": "In which markets can customers pay with Walley on Adyen?",
+      "connector": "adyen",
+      "payment_method": "walley",
+      "countries": [
+        "SE",
+        "NO",
+        "DK",
+        "FI"
+      ],
+      "currencies": [
+        "DKK",
+        "EUR",
+        "NOK",
+        "SEK"
+      ],
+      "file": "config/development.toml",
+      "line": 721
+    },
+    {
+      "id": "R10",
+      "question": "Where is MobilePay available on Adyen?",
+      "connector": "adyen",
+      "payment_method": "mobile_pay",
+      "countries": [
+        "DK",
+        "FI"
+      ],
+      "currencies": [
+        "DKK",
+        "SEK",
+        "NOK",
+        "EUR"
+      ],
+      "file": "config/development.toml",
+      "line": 713
+    },
+    {
+      "id": "R11",
+      "question": "Is Affirm available on Adyen, and where?",
+      "connector": "adyen",
+      "payment_method": "affirm",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "file": "config/development.toml",
+      "line": 718
+    },
+    {
+      "id": "R12",
+      "question": "Which countries support Flexiti?",
+      "connector": "flexiti",
+      "payment_method": "flexiti",
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ],
+      "file": "config/development.toml",
+      "line": 985
+    }
+  ],
+  "tricks": [
+    {
+      "id": "T1",
+      "question": "What minimum customer age is required to use Klarna on Stripe?"
+    },
+    {
+      "id": "T2",
+      "question": "What is the refund window in days for Giropay payments on Stripe?"
+    },
+    {
+      "id": "T3",
+      "question": "What cooling-off period applies to Afterpay payments in the UK?"
+    }
+  ]
+}
