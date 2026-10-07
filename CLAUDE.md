@@ -20,10 +20,10 @@ Workflow style inspired by [sachin0034-tech/dev-os](https://github.com/sachin003
 | # | Stage | Skill / output | Status |
 |---|---|---|---|
 | 1 | Product definition | `docs/CodeCompass_PRD.md` | done (PRD Weeks 1-4) |
-| 2 | Engineering plan | `/engineering-planner` -> `docs/engineering/engineering-doc.md` | next |
-| 3 | Implementation specs | `/implementation-specs` -> `docs/specs/`, `.env.example` | partly done (`docs/spec.md`) |
+| 2 | Engineering plan | `/engineering-planner` -> `docs/engineering/engineering-doc.md` | done |
+| 3 | Implementation specs | `/implementation-specs` -> `docs/specs/`, `.env.example` | done (tested, approved) |
 | 4 | Foundry backend (index + agent) | `ingest/`, `scripts/`, `prompts/`; agent `Codecompass-agent` v4 | done; prompt v2 pending |
-| 5 | Frontend setup | `/frontend-setup` -> `web/` (Next.js) and `server/` (FastAPI) | next |
+| 5 | Frontend setup | `/frontend-setup` -> `web/` (Next.js) and `server/` (FastAPI) | in progress |
 | 6 | Feature implementation | build to `docs/spec.md`; apply `/design-system` to all UI | not started |
 | 7 | Evaluation | `/honesty-eval`, `/verify-absence` -> `eval/results/` | in progress (first run done) |
 | 8 | Security | `/security-foundation` -> `docs/security/security-plan.md` | not started |

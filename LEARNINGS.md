@@ -156,3 +156,20 @@ why it happened, and what we did. Newest entries at the bottom. Format: Problem,
 - **Takeaway:** for LLM apps, the quota (tokens per minute) is often the real constraint, before money. Measure tokens per request early and design the eval around it.
 - **Fix applied (by the user, in the portal Quota page):** the Quota page showed the subscription had 500K TPM for gpt-5-mini (Global) with only 50K allocated to the deployment (rate limiting 4.76%).
   Raised the deployment to 201K TPM. Earlier I wrongly assumed a free/tiered subscription would cap this; it did not. Takeaway: look at the actual quota page before guessing.
+
+## 17. Publishing the repo: what the checks caught (2026-10-05)
+- **Scan controls caught a bug in our own scan:** the pre-publish sensitive-content scan had a planted-string control for each pattern; the `employer` pattern failed it
+  because it was case-sensitive (a lowercase pattern did not match a capitalised planted sample). Without the control the scan would have missed capitalised mentions. After the fix: 33 files read, 0 hits in 10 categories.
+- **Anything with a public effect was checked from the outside:** after pushing we asked GitHub itself (not our own machine) for the file count (32), the commit author
+  (the no-reply address, so no personal email in history), the visibility, and whether `.claude/skills` arrived as a symlink. GitHub showed "license: none detected" for a few seconds
+  before detecting MIT; a short indexing delay, not a problem with the file.
+- **Reversible clean-up:** two out-of-date files were moved to an ignored `_local_archive/` instead of deleted.
+- **Git identity** was set for this repo only (not globally), using GitHub's no-reply address.
+- **Takeaway:** for public actions, show the exact list first, get a yes, do it, then verify from the receiving side.
+
+## 18. Specs are cheaper to fix than code, so we ran them before approving (2026-10-05)
+- **What we did:** Stage 3 specs were executed, not just read. The SQLite schema was run against a real SQLite (it rejects an empty or 501-character question, bad JSON, an invalid verdict, a verdict without its
+  timestamp, and any rewrite of the original answer). The citation-checker algorithm was implemented as a throwaway reference and run against 14 fixtures built from real lines in the pinned repos
+  (including the BitPay wrong-lines case and the Airwallex prefix case). All JSON examples in the specs were parsed.
+- **What it caught:** the spec said "the first note" without defining an order (a citation can carry `prefix_stripped` and `range_loose` together). We added an explicit priority rule and re-ran: 14/14.
+- **Takeaway:** a spec you can execute is a spec you can trust; the same fixtures become the unit tests in Stage 5, so the code is held to exactly what was approved.

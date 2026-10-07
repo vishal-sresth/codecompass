@@ -1,0 +1,33 @@
+{
+  "description": "Fixtures for the citation checker. Data comes from the pinned repos (hyperswitch d03f8547d6367fab56690e4f5043590be4935dcd, active_merchant ca45b1b063ce2e1495e1427e0a1d42dcb482d57d). 'first_note' is the expected first note code.",
+  "cases": [
+    {"id": "C01_exact", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 31, "line_end": 31,
+     "evidence": "self.default_currency = 'USD'", "expect": {"verified": true, "first_note": "ok"}},
+    {"id": "C02_prefix_stripped_airwallex", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/airwallex.rb", "line_start": 7, "line_end": 8,
+     "evidence": " 7 |       # per https://www.airwallex.com/docs/online-payments__overview, cards are accepted in all EU countries", "expect": {"verified": true, "first_note": "prefix_stripped"}},
+    {"id": "C03_range_loose", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 30, "line_end": 31,
+     "evidence": "self.supported_countries = %w(AE AT AU BE BG BR CA CH CY CZ", "expect": {"verified": true, "first_note": "range_loose"}},
+    {"id": "C04_off_by_one", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 32, "line_end": 32,
+     "evidence": "self.default_currency = 'USD'", "expect": {"verified": true, "first_note": "range_off_by_1"}},
+    {"id": "C05_found_elsewhere_bitpay", "repo": "hyperswitch", "file": "config/config.example.toml", "line_start": 644, "line_end": 645,
+     "evidence": "[pm_filters.bitpay]\ncrypto_currency = { country = \"US, CA, GB, AT, BE, BG, HR", "expect": {"verified": false, "first_note": "found_elsewhere", "found_lines": [1003, 1004]}},
+    {"id": "C06_truncated", "repo": "hyperswitch", "file": "config/development.toml", "line_start": 650, "line_end": 650,
+     "evidence": "apple_pay = { country = \"AU, AT, BE, BR, BG, CA, HR, CY, CZ, DK, EE, FI, FR, DE, GR, HU, H...", "expect": {"verified": true, "first_note": "truncated"}},
+    {"id": "C07_not_in_file", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 30, "line_end": 31,
+     "evidence": "self.supported_countries = %w(XX YY ZZ)", "expect": {"verified": false, "first_note": "not_found"}},
+    {"id": "C08_file_missing", "repo": "hyperswitch", "file": "config/does_not_exist.toml", "line_start": 1, "line_end": 2,
+     "evidence": "anything that is long enough", "expect": {"verified": false, "first_note": "file_missing"}},
+    {"id": "C09_range_out_of_bounds", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 860, "line_end": 900,
+     "evidence": "self.default_currency = 'USD'", "expect": {"verified": false, "first_note": "range_invalid"}},
+    {"id": "C10_case_and_whitespace", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 31, "line_end": 31,
+     "evidence": "SELF.default_currency     =   'usd'", "expect": {"verified": true, "first_note": "ok"}},
+    {"id": "C11_path_traversal", "repo": "hyperswitch", "file": "../../../../etc/hosts", "line_start": 1, "line_end": 1,
+     "evidence": "localhost", "expect": {"verified": false, "first_note": "path_outside_repo"}},
+    {"id": "C12_evidence_too_short", "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 31, "line_end": 31,
+     "evidence": "us", "expect": {"verified": false, "first_note": "evidence_too_short"}},
+    {"id": "C13_multiline_evidence", "repo": "hyperswitch", "file": "config/deployments/production.toml", "line_start": 595, "line_end": 596,
+     "evidence": "[pm_filters.coinbase]\ncrypto_currency = { country = \"ZA,US,BR,CA,TR,SG,VN,GB,DE,FR,ES,PT,IT,NL,AU\" }", "expect": {"verified": true, "first_note": "ok"}},
+    {"id": "C14_unknown_repo", "repo": "no_such_repo", "file": "a.rb", "line_start": 1, "line_end": 1,
+     "evidence": "something long enough", "expect": {"verified": false, "first_note": "unknown_repo"}}
+  ]
+}

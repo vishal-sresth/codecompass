@@ -34,10 +34,10 @@ The project follows a gated workflow: after each stage, stop and ask. See [`CLAU
 | Stage | Skill / output | Status |
 |---|---|---|
 | 1 Product definition | `docs/CodeCompass_PRD.md` | done |
-| 2 Engineering plan | `/engineering-planner` | next |
-| 3 Implementation specs | `/implementation-specs` | partly (`docs/spec.md`) |
+| 2 Engineering plan | `/engineering-planner` | done |
+| 3 Implementation specs | `/implementation-specs` | done (`docs/specs/`) |
 | 4 Foundry backend | `ingest/`, `scripts/`, `prompts/` | done; prompt v2 pending |
-| 5 Frontend and server | `/frontend-setup` | next |
+| 5 Frontend and server | `/frontend-setup` | in progress |
 | 6 Features | `/design-system` | not started |
 | 7 Evaluation | `/honesty-eval`, `/verify-absence` | in progress |
 | 8 Security | `/security-foundation` | not started |
