@@ -2,7 +2,7 @@
 .env
 hyperswitch/
 repos/
-ingest/out/
+ingest/out*/
 __pycache__/
 node_modules/
 .next/

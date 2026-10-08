@@ -48,15 +48,17 @@ Startup: read the agent's latest version once (read-only) to record `agent_versi
 - **Platform:** Azure AI Foundry project; agent `Codecompass-agent` (versioned; v4 current, v1 to v3 retained for rollback).
 - **Model:** `gpt-5-mini` (Global Standard deployment, tokens-per-minute limit raised from 50K to about 200K), reasoning effort low. Embeddings for the index: `text-embedding-3-small`.
 - **Tools:** `file_search` only. **No web search**, no other tool; adding one needs an explicit decision (see `/foundry-agent-change`).
-- **Knowledge:** one vector store, 2,397 chunk files (about 8.4 MB), built by `ingest/ingest.py` and uploaded by `scripts/upload_chunks.py` (full upload took about 2 h 15 min).
-  Chunk rules: up to 60 lines and 2,400 characters (so the service does not re-split), overlap of up to 10 lines capped at a third of the chunk, header `REPO / COMMIT / PATH / SECTION / LINES`, numbered lines.
-  `SECTION` = nearest `[toml section]` or `class/module` line above the chunk, so a rule stays attached to its connector.
+- **Knowledge:** one vector store. The index in agent v4 holds 2,397 chunk files (about 8.4 MB, uploaded in about 2 h 15 min). A **rebuilt set of 2,954 token-sized chunks** is generated and verified locally
+  (`ingest/out_v2/`, `python ingest/verify_chunks.py`) and will be uploaded to a new store for agent v5; v4 stays as the rollback.
+  Chunk rules (v2): at most 600 tokens per chunk file including header, counted with the larger of two tokenizers (the service re-splits above about 800 tokens and the second piece loses its header; see `LEARNINGS.md` 21);
+  a source line over 400 tokens is split at commas into `[part n/m]` rows, each continuation preceded by a hint row `>> line N continues; it begins: ...`; overlap of up to 10 rows, capped at a third of the chunk;
+  header `REPO / COMMIT / PATH / SECTION / LINES`, numbered rows with the real line numbers. `SECTION` is the nearest `[toml section]` or, for Ruby, the innermost enclosing class tracked with a push/pop on `class`/`end`.
 - **Indexed sources (pinned):** Hyperswitch `config/` (4 files; production environment preferred) and active_merchant `lib/active_merchant/billing/gateways/*.rb` (242 files).
 - **Prompt:** `prompts/system_v1.md`; output is one JSON object `{answer, rules[{rule, category, citations[{repo,file,line_start,line_end,evidence}], reasoning}], gaps[{looked_in, not_found, suggested_follow_up}]}`.
   Rules: use only File Search; say so when not found; never invent; if the owning connector is unclear, put it under gaps; report conflicting values from different files separately.
 - **Prompt v2 (planned, not yet applied):** quote evidence without the `NN |` prefix; cite the tightest lines; if nothing answers the question return `rules: []` and keep adjacent facts in the answer or gaps; suggestions for engineering may only point at things seen in results.
 - **Change procedure:** user edits in the portal -> Claude verifies read-only -> `/honesty-eval` before and after -> log in `LEARNINGS.md`.
-- **Observed cost:** 17-35K input and 0.7-2K output tokens per question; 10-25 s latency. Price per token is **not verified here**; check the deployment's pricing in the portal.
+- **Observed cost:** 17-35K input and 0.7-2K output tokens per question; 10-25 s latency. Measured in Foundry Traces (estimated cost column): about **$0.006 to $0.010 per question** (17K to 44K input tokens), so the planned 38-call eval costs roughly $0.30 to $0.40.
 
 ## 7. Data
 - **Index:** see section 6. Regenerable with `scripts/setup_repos.sh` + `ingest/ingest.py`.

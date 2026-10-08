@@ -1,50 +1,35 @@
-# Resume notes (written 2026-10-05, end of day 1 of the build)
+# Resume notes (updated 2026-10-08)
 
-Demo due **Fri 2026-10-09 / Sat 2026-10-10** (Demo Day). Public repo: https://github.com/vishal-sresth/codecompass
+Demo Day: **Fri 2026-10-09 / Sat 2026-10-10**. Public repo: https://github.com/vishal-sresth/codecompass
+
+## The demo
+**One company's codebase, a handful of PM-style rules questions.** Codebase: Hyperswitch (open-source payments product, standing in for "your product's code"). The second codebase (active_merchant) stays in a separate index as a later generalisation test and is not shown. Script: `docs/DEMO.md`.
 
 ## Where we are
 | Stage | State |
 |---|---|
-| 1 Product definition (PRD) | done (`docs/CodeCompass_PRD.md`) |
-| 2 Engineering plan | **written** (`docs/engineering/engineering-doc.md`), approved by the user |
-| 3 Implementation specs | **written and tested** (`docs/specs/`, 6 files), **waiting for the user's approval** |
-| 4 Foundry backend | done: agent `Codecompass-agent` v4 (GPT-5 mini, file_search only, 2,397-chunk index), prompt `prompts/system_v1.md`; prompt v2 is planned, not applied |
-| 5 Frontend and server | **next**: not started |
-| 6-9 features, eval, security, publish | not started (eval first run done: see `LEARNINGS.md` 15) |
+| 1 to 3 | done (PRD, engineering doc, specs) |
+| 4 Foundry backend | done: agent `Codecompass-agent` v6 = GPT-5 mini, file_search only, store `codecompass-hyperswitch` (894 chunks), prompt system_v1. Older versions v4/v5 and the two-codebase store are kept for rollback and comparison |
+| 5 Frontend and server | done: FastAPI server (citation checker, SQLite log, parser) and Next.js page; 79 server tests + 17 scorer tests |
+| 6 Features | v0.1 UI done and polished after the first user test (real source lines, plain badge, category hidden unless `?debug=1`, "show more rules" after 5) |
+| 7 Evaluation | first live run on v6 done (`eval/results/hs_live_20261007_2028.json`): 11 of 12 answerable pass (the miss: right fact, wrong section), 9 of 9 absent-concept runs invent nothing, 0 unverified citations. Not done: repeats of answerable questions, a larger set, prompt v2 |
+| 8 Security | not started (`/security-foundation`) |
 
-## NOT yet pushed (local only)
-`docs/engineering/engineering-doc.md`, `docs/specs/*`, updated `.env.example`, `LEARNINGS.md` entries 17-18, this file.
-Before pushing: update the stage tables in `CLAUDE.md` and `README.md` (Stages 2 and 3 -> done), show the user the exact file list, get a yes, then commit (git identity is already set for this repo only: "Vishal Sresth" with the GitHub no-reply address; never use the Gmail) and push.
+## Next steps
+1. Push to GitHub after the pre-push scan (`python scripts/prepush_scan.py --also "<employer>,<your resource names>"`), the user's yes on the file list, never committing `.env`, `.venv`, source repos, chunks, logs or `web/node_modules`.
+2. Optional stability check: 2 more runs of each of the three demo questions (about 6 calls, about $0.06).
+3. Record the demo; keep the recording as the fallback.
+4. After Demo Day: prompt v2 (cite the connector's own section, tighter ranges, no adjacent rules), repeats of the answerable set, security plan, a second codebase.
 
-## First things to do tomorrow, in order
-1. Ask the three questions that closed the last session (the stage-3 gate): (a) approve `docs/specs/`? (b) push now? (c) start Stage 5?
-2. Update the stage tables, show the file list, push (with approval).
-3. **Stage 5, step 0 (user does it in the Foundry portal):** agent -> Traces tab -> Connect -> create a new Application Insights resource (same resource group and region). Explain why: Traces needs it; our calls then show tokens and latency.
-4. Create `repos.json` (pinned repos and SHAs shared by `ingest/ingest.py`, the checker and the server) and switch `ingest.py` to read it.
-5. Run `/frontend-setup` by hand: `server/` (FastAPI skeleton + `/api/health`) and `web/` (Next.js), prove the wiring with a visible "server: ok". Check current stable versions first; do not hard-code from memory.
-6. Then, in order: `/design-system` (creates `docs/design.md`; ask the user four questions), build `server/` (checker from `citation-checker.md` with the 14 fixtures as unit tests, storage from `storage-schema.sql`, `/api/ask`, `/api/verdict`), build the UI to `docs/spec.md` and `docs/specs/ui-states.md`.
-7. First end-to-end run **with the user driving**; only then decide prompt v2.
-
-## Open items (do not lose)
-- Replace trick question **T4** (crypto was invalid; the code says `crypto_currency`) using `/verify-absence`.
-- Label about 8 active_merchant answerable rules (the 12 Hyperswitch ones are in `demo/ground_truth.json`); target about 20 answerable. Trick questions run 3x each; answerable 1x.
-- Prompt v2 (after the first end-to-end run): evidence without the `NN |` prefix, tightest line range, no relevance creep (adjacent facts only in answer/gaps), engineering suggestions only about things seen in results.
-- The user was going to try "Is Klarna available in Germany?" in the Playground and paste the answer (does it name connectors and environments, or guess?). Not yet reported.
-- Verify the Hyperswitch line of `scripts/setup_repos.sh` (the active_merchant line was tested and works).
-- Check all 4 UI example-chip questions before showing them in the demo.
-- Token price per question is not verified; check the deployment's pricing in the portal. Deployment quota was raised from 50K to about 201K tokens per minute.
-- Add `.claude/skills` check: skills may need a Claude Code restart to appear as slash commands.
-- Demo plan: three live questions (answerable, honest not-found, ambiguous), show the evidence and badges, the verdict, the log, and a Foundry trace; record a backup video.
 
 ## Working agreement (standing rules)
-- Teach and partner: say what, why and what it produces; small steps; ask at decisions.
-- **Ask before anything that calls Azure/Foundry** (agent or model calls, uploads, eval runs, resource changes) and say roughly what it costs. The user makes Foundry portal changes themselves; Claude drafts and verifies read-only.
-- Ask before anything public (GitHub). Show the exact file list first. Never commit `.env`, `.venv`, source repos, chunks or logs.
-- Keep `LEARNINGS.md` current. Never trust "0 matches" without a positive control and a count of files read; never report "done" from an `echo`; verify from the receiving side.
+- Teach and partner; small steps; ask at decisions. The user asked on 2026-10-07 to move fast: keep explanations short, keep the safeguards.
+- **Ask before anything that calls Azure/Foundry** (agent or model calls, uploads, eval runs, resource changes) and say roughly what it costs. The user makes Foundry portal changes; Claude drafts and verifies read-only.
+- Ask before anything public (GitHub). Show the exact file list first.
+- Keep `LEARNINGS.md` current. Never trust "0 matches" without a positive control and a count of files read; never report "done" from an `echo`; verify from the receiving side; check your own checks (a `pgrep -f` can match its own shell).
 - Stage-gated: stop after each stage and ask.
 
 ## Environment gotchas
-- Start Claude Code **from VS Code's integrated terminal** (`claude --continue`). A Claude process that became an orphan lost folder access on macOS ("Operation not permitted"): see `LEARNINGS.md` 13.
-- Run `brew` from the home folder. Auth for Azure is `az login`; GitHub is `gh` (logged in as `vishal-sresth`).
-- Use Python (not shell grep) for searches; quote URLs containing `?` in zsh.
-- Python env: `.venv` (azure-ai-projects, azure-identity). `.env` holds names only.
+- Start Claude Code from VS Code's integrated terminal (`claude --continue`); an orphaned process lost folder access once (`LEARNINGS.md` 13).
+- Use the project venv (`.venv/bin/python`) for anything that imports `ingest` (needs `tiktoken`). Run `brew` from the home folder. Azure auth is `az login`; GitHub is `gh` (logged in).
+- Use Python (not shell grep) for searches; quote URLs with `?` in zsh. A background launcher's "completed" notice only means the launcher exited.

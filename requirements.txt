@@ -1,0 +1,17 @@
+# Python packages for CodeCompass. Install into the project venv:  pip install -r requirements.txt
+# Versions are pinned (checked 2026-10-06) so the build is repeatable.
+
+# Foundry client and Azure sign-in (az login)
+azure-ai-projects==2.7.0
+azure-identity==1.26.0
+
+# Index builder (token-sized chunks)
+tiktoken==0.14.0
+
+# Server
+fastapi==0.142.2
+uvicorn==0.54.0
+
+# Tests
+pytest==9.1.1
+httpx==0.28.1

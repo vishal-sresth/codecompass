@@ -24,16 +24,17 @@ Browser renders the result
 Rules: no secrets in the browser or in git; `.env` holds only non-secret settings; the agent is the only source of answers (no web search, no outside knowledge).
 
 ## 3. The one screen
-1. **Header:** "CodeCompass" and a one-line disclosure: "Candidate answers from the code. Verify before using in PRDs, launches or compliance decisions."
-2. **Question box** with a Submit button and 4 example questions (answerable, absent, ambiguous, and one about a specific connector). A repo filter is out of scope for v0.1.
+1. **Header:** the title "CodeCompass" and ONE plain line saying what it is and does: "Ask plain-English questions about how your product's code works, and get answers backed by the exact lines of code." (user decision 2026-10-08: the headline is the purpose, not a warning).
+2. **Question box** with a Submit button, a character counter, and, directly beneath it, a small muted note that is always visible: "Candidate answers from the code. Verify before using in PRDs, launches or compliance decisions." No example-question buttons (user decision 2026-10-08; demo questions are typed or pasted). A repo filter is out of scope for v0.1.
 3. **Answer panel** (the agent's `answer`, 2-4 plain sentences).
 4. **Rules panel:** one card per rule with
+   (decisions 2026-10-08: the category label is a builder detail shown only with `?debug=1`, because it is the model's guess; after the first 5 rules the panel offers "Show N more rules", so the gaps and verdict stay within reach.)
    - the plain-English rule and a category label (regulatory / commercial / technical / unknown);
    - citations as `repo / file : line_start-line_end`, with the evidence text in a code box;
    - a badge: **Citation verified** (green) when the cited lines contain the evidence, **Could not verify** (amber) otherwise. Never hide an unverified rule; show it with the amber badge.
 5. **Gaps panel**, always visible even when empty: "Where I looked and did not find it", with `looked_in`, `not_found` and `suggested_follow_up`.
 6. **Verdict buttons** under every answer (including "not found" answers): **Correct / Partial / Wrong** and an optional note. Saved state is shown ("Saved"). These labels feed the eval set.
-7. **Status bar:** latency, input/output tokens, agent version. (Cost is estimated later; tokens only for now.)
+7. **Builder details (hidden by default):** latency, input/output tokens, agent version, prompt version, and the server-status line appear only when the page address has `?debug=1`. The PM-facing page shows none of them (user decision 2026-10-08).
 8. **States:** loading (answers take 15-35 s, show elapsed seconds), empty, and errors, including a friendly message for rate limiting ("The model is busy; wait a minute and try again").
 
 ## 4. Behaviour rules (must hold)

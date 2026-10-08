@@ -1,0 +1,683 @@
+{
+  "description": "Hyperswitch-only question set for the one-codebase demo. Ground truth verified against the pinned files by code with positive controls (see verification).",
+  "repo": "hyperswitch",
+  "sha": "d03f8547d6367fab56690e4f5043590be4935dcd",
+  "indexed_files": [
+    "config/development.toml",
+    "config/deployments/production.toml",
+    "config/config.example.toml",
+    "config/payment_required_fields_v2.toml"
+  ],
+  "verification": {
+    "date": "2026-10-07",
+    "files_read": 4,
+    "answerable_verified": 12,
+    "method": "each answerable item: the development.toml line holds the payment method, its [pm_filters.<connector>] section is the named connector, countries and currencies equal the expected sets; the same entry was then located in the other environment files and compared",
+    "controls": {
+      "klarna": 50,
+      "giropay": 43,
+      "pm_filters": 290,
+      "afterpay": 17
+    },
+    "note_environments": "all 12 answerable facts have identical values in production.toml (12 of 12), so an answer citing either file is correct"
+  },
+  "answerable": [
+    {
+      "id": "R1",
+      "question": "Where can we offer Affirm through Stripe, and in which currency?",
+      "connector": "stripe",
+      "payment_method": "affirm",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 654,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 713,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "question": "Which countries and currencies is Cash App Pay available in on Stripe?",
+      "connector": "stripe",
+      "payment_method": "cashapp",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 656,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 716,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "question": "Where is EPS available on Stripe?",
+      "connector": "stripe",
+      "payment_method": "eps",
+      "countries": [
+        "AT"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 657,
+          "countries": [
+            "AT"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 717,
+          "countries": [
+            "AT"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "question": "Why can't we use Giropay on Stripe outside Germany?",
+      "connector": "stripe",
+      "payment_method": "giropay",
+      "countries": [
+        "DE"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 658,
+          "countries": [
+            "DE"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 718,
+          "countries": [
+            "DE"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "question": "Which countries can use iDEAL on Stripe?",
+      "connector": "stripe",
+      "payment_method": "ideal",
+      "countries": [
+        "NL"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 659,
+          "countries": [
+            "NL"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 720,
+          "countries": [
+            "NL"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "question": "Why is Klarna on Stripe available in Germany but not in India?",
+      "connector": "stripe",
+      "payment_method": "klarna",
+      "countries": [
+        "AT",
+        "AU",
+        "BE",
+        "CA",
+        "CH",
+        "CZ",
+        "DE",
+        "DK",
+        "ES",
+        "FI",
+        "FR",
+        "GB",
+        "GR",
+        "IE",
+        "IT",
+        "NL",
+        "NO",
+        "NZ",
+        "PL",
+        "PT",
+        "SE",
+        "US"
+      ],
+      "currencies": [
+        "AUD",
+        "CAD",
+        "CHF",
+        "CZK",
+        "DKK",
+        "EUR",
+        "GBP",
+        "NOK",
+        "NZD",
+        "PLN",
+        "SEK",
+        "USD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 651,
+          "countries": [
+            "AT",
+            "AU",
+            "BE",
+            "CA",
+            "CH",
+            "CZ",
+            "DE",
+            "DK",
+            "ES",
+            "FI",
+            "FR",
+            "GB",
+            "GR",
+            "IE",
+            "IT",
+            "NL",
+            "NO",
+            "NZ",
+            "PL",
+            "PT",
+            "SE",
+            "US"
+          ],
+          "currencies": [
+            "AUD",
+            "CAD",
+            "CHF",
+            "CZK",
+            "DKK",
+            "EUR",
+            "GBP",
+            "NOK",
+            "NZD",
+            "PLN",
+            "SEK",
+            "USD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 721,
+          "countries": [
+            "AT",
+            "AU",
+            "BE",
+            "CA",
+            "CH",
+            "CZ",
+            "DE",
+            "DK",
+            "ES",
+            "FI",
+            "FR",
+            "GB",
+            "GR",
+            "IE",
+            "IT",
+            "NL",
+            "NO",
+            "NZ",
+            "PL",
+            "PT",
+            "SE",
+            "US"
+          ],
+          "currencies": [
+            "AUD",
+            "CAD",
+            "CHF",
+            "CZK",
+            "DKK",
+            "EUR",
+            "GBP",
+            "NOK",
+            "NZD",
+            "PLN",
+            "SEK",
+            "USD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R7",
+      "question": "Where is MB Way available on Adyen?",
+      "connector": "adyen",
+      "payment_method": "mb_way",
+      "countries": [
+        "PT"
+      ],
+      "currencies": [
+        "EUR"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 716,
+          "countries": [
+            "PT"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 408,
+          "countries": [
+            "PT"
+          ],
+          "currencies": [
+            "EUR"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R8",
+      "question": "Which countries and currencies does PayBright on Adyen support?",
+      "connector": "adyen",
+      "payment_method": "pay_bright",
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 720,
+          "countries": [
+            "CA"
+          ],
+          "currencies": [
+            "CAD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 421,
+          "countries": [
+            "CA"
+          ],
+          "currencies": [
+            "CAD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R9",
+      "question": "In which markets can customers pay with Walley on Adyen?",
+      "connector": "adyen",
+      "payment_method": "walley",
+      "countries": [
+        "DK",
+        "FI",
+        "NO",
+        "SE"
+      ],
+      "currencies": [
+        "DKK",
+        "EUR",
+        "NOK",
+        "SEK"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 721,
+          "countries": [
+            "DK",
+            "FI",
+            "NO",
+            "SE"
+          ],
+          "currencies": [
+            "DKK",
+            "EUR",
+            "NOK",
+            "SEK"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 435,
+          "countries": [
+            "DK",
+            "FI",
+            "NO",
+            "SE"
+          ],
+          "currencies": [
+            "DKK",
+            "EUR",
+            "NOK",
+            "SEK"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R10",
+      "question": "Where is MobilePay available on Adyen?",
+      "connector": "adyen",
+      "payment_method": "mobile_pay",
+      "countries": [
+        "DK",
+        "FI"
+      ],
+      "currencies": [
+        "DKK",
+        "EUR",
+        "NOK",
+        "SEK"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 713,
+          "countries": [
+            "DK",
+            "FI"
+          ],
+          "currencies": [
+            "DKK",
+            "EUR",
+            "NOK",
+            "SEK"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 410,
+          "countries": [
+            "DK",
+            "FI"
+          ],
+          "currencies": [
+            "DKK",
+            "EUR",
+            "NOK",
+            "SEK"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R11",
+      "question": "Is Affirm available on Adyen, and where?",
+      "connector": "adyen",
+      "payment_method": "affirm",
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 718,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 377,
+          "countries": [
+            "US"
+          ],
+          "currencies": [
+            "USD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    },
+    {
+      "id": "R12",
+      "question": "Which countries support Flexiti?",
+      "connector": "flexiti",
+      "payment_method": "flexiti",
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ],
+      "environments": [
+        {
+          "file": "config/development.toml",
+          "line": 985,
+          "countries": [
+            "CA"
+          ],
+          "currencies": [
+            "CAD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 663,
+          "countries": [
+            "CA"
+          ],
+          "currencies": [
+            "CAD"
+          ],
+          "same_as_development": true
+        },
+        {
+          "file": "config/config.example.toml",
+          "line": 1036,
+          "countries": [
+            "CA"
+          ],
+          "currencies": [
+            "CAD"
+          ],
+          "same_as_development": true
+        }
+      ]
+    }
+  ],
+  "trick": [
+    {
+      "id": "H-T1",
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "source": "eval/trick_questions.json T1",
+      "absent_terms_checked": {
+        "sanction": 0,
+        "\\bofac\\b": 0,
+        "embargo": 0,
+        "blocklist": 0,
+        "denylist": 0,
+        "blocked_countries|restricted_countries": 0
+      }
+    },
+    {
+      "id": "D-T1",
+      "question": "What minimum customer age is required to use Klarna on Stripe?",
+      "source": "demo/ground_truth.json T1",
+      "absent_terms_checked": {
+        "min(imum)?_?age": 0,
+        "customer_age": 0,
+        "age_limit": 0,
+        "\\bdob\\b": 0
+      },
+      "note": "date_of_birth appears once, as a required field of a different wallet (payment_required_fields_v2.toml); \\bage\\b appears once, in the refund max_age comment. Neither concerns Klarna."
+    },
+    {
+      "id": "D-T3",
+      "question": "What cooling-off period applies to Afterpay payments in the UK?",
+      "source": "demo/ground_truth.json T3",
+      "absent_terms_checked": {
+        "cool(ing)?[_ -]?off": 0,
+        "cooling": 0,
+        "withdrawal_period": 0,
+        "right_of_withdrawal": 0
+      },
+      "note": "afterpay itself appears 17 times in the indexed files (control), so the question is plausible; no cooling-off concept exists."
+    }
+  ],
+  "near_miss": [
+    {
+      "id": "D-T2",
+      "question": "What is the refund window in days for Giropay payments on Stripe?",
+      "source": "demo/ground_truth.json T2",
+      "note": "NEAR-MISS, not a pure absent concept. A global [refund] max_age = 365 exists in development.toml (lines 327-329) and config.example.toml (lines 290-292, 'Max age of a refund in days'); it is absent from production.toml. Nothing is specific to Giropay or Stripe. A good answer says there is no Giropay- or Stripe-specific window and may mention the global setting with its scope. Needs human review.",
+      "evidence": [
+        {
+          "file": "config/development.toml",
+          "lines": [
+            327,
+            329
+          ]
+        },
+        {
+          "file": "config/config.example.toml",
+          "lines": [
+            290,
+            292
+          ]
+        }
+      ]
+    }
+  ],
+  "dropped": [
+    {
+      "id": "eval T4 (crypto)",
+      "why": "invalid: the code calls it crypto_currency (14 lines) with connectors coinbase (13) and bitpay (10)"
+    },
+    {
+      "id": "eval T2, T3, T5",
+      "why": "concern active_merchant, not Hyperswitch (one-codebase demo)"
+    }
+  ],
+  "recommended_for_demo": {
+    "status": "PENDING live verification on the new Hyperswitch-only index; do not show any question that has not been run and checked",
+    "answerable": [
+      "R6",
+      "R4"
+    ],
+    "not_found": [
+      "D-T1"
+    ],
+    "optional": [
+      "R9",
+      "H-T1"
+    ],
+    "why": "R6 and R4 are 'why can't we offer X in Y' questions in a PM's voice with exact expected sets; D-T1 is a pure absent concept with a plausible premise; D-T2 stays out of the live demo (near-miss needs explaining)."
+  }
+}

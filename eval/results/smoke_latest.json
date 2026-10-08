@@ -1,0 +1,78 @@
+[
+  {
+    "question": "Which countries does the Redsys gateway in active_merchant support?",
+    "status": 200,
+    "result": {
+      "id": 8,
+      "answer": "There are two Redsys connectors in the codebase and they support different countries: the RedsysGateway supports ES, FR, GB, IT, PL, PT, while the RedsysRestGateway supports only ES. If you need to know which to use in production, ask engineering which connector (Redsys vs Redsys REST) your integration uses.",
+      "rules": [
+        {
+          "rule": "The RedsysGateway supports Spain (ES), France (FR), United Kingdom (GB), Italy (IT), Poland (PL) and Portugal (PT).",
+          "category": "commercial",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/redsys.rb",
+              "line_start": 42,
+              "line_end": 42,
+              "evidence": "self.supported_countries = %w[ES FR GB IT PL PT]",
+              "verified": true,
+              "verify_notes": [
+                "ok"
+              ],
+              "verify_text": "Citation verified",
+              "found_lines": [
+                42,
+                42
+              ]
+            }
+          ],
+          "reasoning": "The RedsysGateway class explicitly sets self.supported_countries to the listed country codes, which indicates the countries this gateway advertises support for.",
+          "all_verified": true
+        },
+        {
+          "rule": "The RedsysRestGateway supports only Spain (ES).",
+          "category": "commercial",
+          "citations": [
+            {
+              "repo": "active_merchant",
+              "file": "lib/active_merchant/billing/gateways/redsys_rest.rb",
+              "line_start": 30,
+              "line_end": 30,
+              "evidence": "self.supported_countries = ['ES']",
+              "verified": true,
+              "verify_notes": [
+                "ok"
+              ],
+              "verify_text": "Citation verified",
+              "found_lines": [
+                30,
+                30
+              ]
+            }
+          ],
+          "reasoning": "The RedsysRestGateway class sets self.supported_countries to ['ES'], indicating it supports only Spain.",
+          "all_verified": true
+        }
+      ],
+      "gaps": [
+        {
+          "looked_in": [
+            "lib/active_merchant/billing/gateways/redsys.rb (class RedsysGateway)",
+            "lib/active_merchant/billing/gateways/redsys_rest.rb (class RedsysRestGateway)",
+            "other nearby Redsys files returned by the search results"
+          ],
+          "not_found": "I did not find any other files that declare different supported countries for other Redsys connectors, nor documentation in the code explaining when to use Redsys vs Redsys REST.",
+          "suggested_follow_up": "Ask engineering which connector (RedsysGateway or RedsysRestGateway) is used by your deployment, and whether any account/bank-level configuration further restricts available countries."
+        }
+      ],
+      "meta": {
+        "seconds": 9.8,
+        "input_tokens": 16108,
+        "output_tokens": 980,
+        "agent_version": 5,
+        "prompt_version": "system_v1"
+      }
+    }
+  }
+]

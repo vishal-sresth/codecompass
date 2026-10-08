@@ -1,106 +1,163 @@
-"""CodeCompass ingest: turn repo files into small, line-numbered chunk files.
+"""CodeCompass ingest: turn repo files into small, line-numbered chunk files for the Foundry vector store.
 
-Why: File Search returns chunk text, not line numbers. So every chunk carries its own
-REPO / PATH / LINES header and numbered lines, which lets the agent cite file:line and
-lets our checker verify the citation against the real file.
+Why chunks carry their own header and line numbers: File Search returns chunk text, not line numbers, so every chunk
+holds REPO / COMMIT / PATH / SECTION / LINES and numbered lines. That lets the agent cite file:line and lets our checker verify it.
 
-Run:  python3 ingest/ingest.py
-Out:  ingest/out/chunks/*.txt  (one file per chunk)  +  ingest/out/manifest.json
+Why chunks are sized in TOKENS: the service re-splits anything above about 800 tokens and the second piece loses the header
+(LEARNINGS.md 21). Country lists are token-dense, so a character limit is not safe. We budget 600 tokens per chunk file and
+measure with two tokenizers, taking the larger count.
+
+Run:   python ingest/ingest.py [--out ingest/out_v2] [--repo hyperswitch]      (needs: pip install tiktoken)
+Out:   <out>/chunks/*.txt (one file per chunk) and <out>/manifest.json
+Check: python ingest/verify_chunks.py [--out ingest/out_v2]
 """
+import argparse
 import fnmatch
 import json
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent  # codecompass/
-OUT = Path(__file__).resolve().parent / "out"
+import tiktoken
 
-# --- To add a repo, add one entry here. -----------------------------------------
-REPOS = [
-    {
-        "name": "hyperswitch",
-        "path": ROOT / "hyperswitch",
-        "sha": "d03f8547d6367fab56690e4f5043590be4935dcd",
-        "include": [
-            "config/development.toml",
-            "config/config.example.toml",
-            "config/deployments/production.toml",
-            "config/payment_required_fields_v2.toml",
-        ],
-    },
-    {
-        "name": "active_merchant",
-        "path": ROOT / "repos" / "active_merchant",
-        "sha": "ca45b1b063ce2e1495e1427e0a1d42dcb482d57d",
-        "include": ["lib/active_merchant/billing/gateways/*.rb"],
-    },
-]
+ROOT = Path(__file__).resolve().parent.parent  # project root
+
+# --- Repos come from repos.json (single source of truth, shared with the checker and the server). ---
+REPOS = [{**r, "path": ROOT / r["path"]} for r in json.loads((ROOT / "repos.json").read_text())["repos"]]
 
 # Never index files that look like secrets (PRD Section 7).
 SECRET_PATTERNS = ["*.env", ".env*", "*.pem", "*.key", "*secret*", "*credential*"]
 
-MAX_LINES = 60    # lines per chunk
-MAX_CHARS = 2400  # about 600 tokens, so the service does not re-split a chunk
-OVERLAP = 10      # lines repeated at the start of the next chunk (see LEARNINGS.md #4)
+MAX_CHUNK_TOKENS = 600   # whole chunk file including header (service window is about 800)
+LINE_MAX_TOKENS = 400    # a single source line longer than this is split into parts
+OVERLAP = 10             # rows repeated at the start of the next chunk, capped at a third of the chunk
 
-# A "section" is the nearest structural line above a chunk, e.g. [pm_filters.stripe] in TOML
-# or `class StripeGateway` in Ruby. Without it, a chunk can lose which connector a rule belongs to.
-SECTION_RE = {
-    ".toml": re.compile(r"^\s*\[[^\]]+\]\s*$"),
-    ".rb": re.compile(r"^\s*(class|module)\s+\S+"),
-}
+_ENCODINGS = [tiktoken.get_encoding(n) for n in ("cl100k_base", "o200k_base")]
 
 
-def find_section(lines, first_line, ext):
-    """Nearest section header at or above first_line (1-based), or None."""
-    rx = SECTION_RE.get(ext)
-    if not rx:
-        return None
-    for i in range(first_line, 0, -1):
-        if rx.match(lines[i - 1]):
-            return lines[i - 1].strip()
-    return None
+def count_tokens(text):
+    """Conservative: the larger of two common tokenizers."""
+    return max(len(e.encode(text, disallowed_special=())) for e in _ENCODINGS)
 
 
-def is_secret(rel: str) -> bool:
+TOML_SECTION = re.compile(r"^\s*\[[^\]]+\]\s*$")
+RUBY_DECL = re.compile(r"^(\s*)(class|module)\s+\S+")
+RUBY_END = re.compile(r"^(\s*)end\b")
+
+
+def section_by_line(lines, ext):
+    """section[i] = the structural label that applies at source line i (1-based), or None.
+    TOML: nearest [section] header at or above. Ruby: innermost enclosing class (else module), tracking nesting by
+    pushing on `class`/`module` and popping on the matching `end` at the same indent."""
+    out = [None] * (len(lines) + 1)
+    if ext == ".toml":
+        cur = None
+        for i, l in enumerate(lines, 1):
+            if TOML_SECTION.match(l):
+                cur = l.strip()
+            out[i] = cur
+    elif ext == ".rb":
+        stack = []  # (indent, kind, text)
+        for i, l in enumerate(lines, 1):
+            m = RUBY_DECL.match(l)
+            if m:
+                stack.append((len(m.group(1)), m.group(2), l.strip()))
+            classes = [s for s in stack if s[1] == "class"]
+            out[i] = (classes[-1] if classes else stack[-1])[2] if stack else None
+            e = RUBY_END.match(l)
+            if e and stack and len(e.group(1)) == stack[-1][0] and not m:
+                stack.pop()
+    return out
+
+
+def split_long_line(text):
+    """Split a line over LINE_MAX_TOKENS into parts, preferring comma boundaries (keeps country codes whole)."""
+    if count_tokens(text) <= LINE_MAX_TOKENS:
+        return [text]
+    parts, cur = [], ""
+    for piece in re.split(r"(?<=,)", text):
+        if cur and count_tokens(cur + piece) > LINE_MAX_TOKENS:
+            parts.append(cur)
+            cur = piece
+        else:
+            cur += piece
+    parts.append(cur)
+    final = []  # a piece with no commas can still be too long: halve it until it fits
+    for p in parts:
+        stack = [p]
+        while stack:
+            q = stack.pop(0)
+            if count_tokens(q) > LINE_MAX_TOKENS and len(q) > 1:
+                stack = [q[: len(q) // 2], q[len(q) // 2:]] + stack
+            else:
+                final.append(q)
+    return final
+
+
+def build_rows(lines):
+    """Rows of (line_no, text_to_show, tokens, is_part). Long lines become several rows with a continuation hint."""
+    width = len(str(len(lines)))
+    rows = []
+    for no, text in enumerate(lines, 1):
+        parts = split_long_line(text)
+        n = len(parts)
+        for k, part in enumerate(parts, 1):
+            label = f"{no:>{width}}" + (f" [part {k}/{n}]" if n > 1 else "")
+            shown = f"{label} | {part}"
+            if k > 1:
+                shown = f">> line {no} continues; it begins: {parts[0][:60].strip()}\n" + shown
+            rows.append((no, shown, count_tokens(shown), n > 1))
+    return rows
+
+
+def build_header(repo, sha, rel, section, a, b):
+    sec = f"SECTION: {section}\n" if section else ""
+    return f"REPO: {repo}\nCOMMIT: {sha[:10]}\nPATH: {rel}\n{sec}LINES: {a}-{b}\n----\n"
+
+
+def chunk_rows(rows, repo, sha, rel, sections, n_lines):
+    """Yield (row_start, row_end) so that header + rows fit MAX_CHUNK_TOKENS; overlap capped at a third of the chunk."""
+    n, s = len(rows), 0
+    while s < n:
+        a = rows[s][0]
+        used = count_tokens(build_header(repo, sha, rel, sections[a], a, n_lines)) + rows[s][2]
+        e = s
+        while e + 1 < n and used + rows[e + 1][2] <= MAX_CHUNK_TOKENS:
+            e += 1
+            used += rows[e][2]
+        yield s, e
+        if e >= n - 1:
+            break
+        keep = min(OVERLAP, (e - s + 1) // 3)
+        s = max(e - keep + 1, s + 1)
+
+
+def is_secret(rel):
     name = rel.rsplit("/", 1)[-1].lower()
     return any(fnmatch.fnmatch(name, p) for p in SECRET_PATTERNS)
 
 
-def chunk_lines(lines):
-    """Yield (start_line, end_line, [lines]) with 1-based line numbers.
-
-    Each chunk after the first re-includes the last OVERLAP lines of the previous one.
-    """
-    n, start = len(lines), 1
-    while start <= n:
-        end, size = start, len(lines[start - 1]) + 8
-        while end < n and (end - start + 1) < MAX_LINES and size + len(lines[end]) + 8 <= MAX_CHARS:
-            end += 1
-            size += len(lines[end - 1]) + 8
-        yield start, end, lines[start - 1:end]
-        if end >= n:
-            break
-        # keep up to OVERLAP lines of context, but never more than a third of the chunk
-        # (long-line files like Hyperswitch config have only ~4 lines per chunk)
-        keep = min(OVERLAP, (end - start + 1) // 3)
-        start = end - keep + 1
-
-
 def main():
-    chunks_dir = OUT / "chunks"
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default="ingest/out_v2", help="output folder, relative to the project root")
+    ap.add_argument("--repo", default=None, help="index only this repo (a name from repos.json), e.g. hyperswitch")
+    args = ap.parse_args()
+    out = ROOT / args.out
+    repos = [r for r in REPOS if args.repo in (None, r["name"])]
+    if not repos:
+        raise SystemExit(f"unknown repo {args.repo!r}; choose from {[r['name'] for r in REPOS]}")
+    chunks_dir = out / "chunks"
     chunks_dir.mkdir(parents=True, exist_ok=True)
     for old in chunks_dir.glob("*.txt"):
         old.unlink()
 
-    manifest = {"repos": [], "indexed": [], "skipped": []}
-    for repo in REPOS:
+    manifest = {"repos": [], "indexed": [], "skipped": [], "settings": {
+        "max_chunk_tokens": MAX_CHUNK_TOKENS, "line_max_tokens": LINE_MAX_TOKENS, "overlap": OVERLAP}}
+    for repo in repos:
         root = repo["path"]
         manifest["repos"].append({"name": repo["name"], "sha": repo["sha"]})
         matched = set()
         for pattern in repo["include"]:
             matched.update(p for p in root.glob(pattern) if p.is_file())
-
         for f in sorted(matched):
             rel = f.relative_to(root).as_posix()
             if is_secret(rel):
@@ -111,25 +168,24 @@ def main():
             except UnicodeDecodeError:
                 manifest["skipped"].append({"repo": repo["name"], "path": rel, "why": "not utf-8"})
                 continue
+            sections = section_by_line(lines, f.suffix)
+            rows = build_rows(lines)
+            safe = re.sub(r"[^A-Za-z0-9]+", "_", f"{repo['name']}_{rel}")
+            n_chunks = 0
+            for idx, (s, e) in enumerate(chunk_rows(rows, repo["name"], repo["sha"], rel, sections, len(lines)), 1):
+                a, b = rows[s][0], rows[e][0]
+                text = build_header(repo["name"], repo["sha"], rel, sections[a], a, b) + "\n".join(r[1] for r in rows[s:e + 1]) + "\n"
+                (chunks_dir / f"{safe}__{idx:04d}__{a}-{b}.txt").write_text(text, encoding="utf-8")
+                n_chunks += 1
+            manifest["indexed"].append({"repo": repo["name"], "path": rel, "lines": len(lines), "rows": len(rows),
+                                        "split_parts": sum(1 for r in rows if r[3]), "chunks": n_chunks})
 
-            n = 0
-            for a, b, buf in chunk_lines(lines):
-                width = len(str(b))
-                body = "\n".join(f"{a + k:>{width}} | {t}" for k, t in enumerate(buf))
-                section = find_section(lines, a, f.suffix)
-                sec = f"SECTION: {section}\n" if section else ""
-                header = f"REPO: {repo['name']}\nCOMMIT: {repo['sha'][:10]}\nPATH: {rel}\n{sec}LINES: {a}-{b}\n----\n"
-                safe = re.sub(r"[^A-Za-z0-9]+", "_", f"{repo['name']}_{rel}")
-                (chunks_dir / f"{safe}__{a}-{b}.txt").write_text(header + body + "\n", encoding="utf-8")
-                n += 1
-            manifest["indexed"].append({"repo": repo["name"], "path": rel, "lines": len(lines), "chunks": n})
-
-    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=2))
     total = sum(x["chunks"] for x in manifest["indexed"])
-    print(f"files indexed: {len(manifest['indexed'])}, skipped: {len(manifest['skipped'])}, chunks written: {total}")
+    print(f"files indexed: {len(manifest['indexed'])}, skipped: {len(manifest['skipped'])}, chunks written: {total}  -> {out.relative_to(ROOT)}")
     for r in manifest["repos"]:
         files = [x for x in manifest["indexed"] if x["repo"] == r["name"]]
-        print(f"  {r['name']}: {len(files)} files, {sum(x['chunks'] for x in files)} chunks")
+        print(f"  {r['name']}: {len(files)} files, {sum(x['chunks'] for x in files)} chunks, {sum(x['split_parts'] for x in files)} split-line parts")
 
 
 if __name__ == "__main__":

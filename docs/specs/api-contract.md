@@ -21,7 +21,8 @@ Success `200`:
       "category": "regulatory | commercial | technical | unknown",
       "citations": [
         { "repo": "active_merchant", "file": "lib/active_merchant/billing/gateways/stripe.rb", "line_start": 30, "line_end": 30,
-          "evidence": "string", "verified": true, "verify_notes": ["ok"], "verify_text": "Citation verified", "found_lines": [30, 30] }
+          "evidence": "string", "verified": true, "verify_notes": ["ok"], "verify_text": "Citation verified", "found_lines": [30, 30],
+          "source_lines": [ { "n": 30, "text": "self.supported_countries = %w(AE AT AU ...)" } ] }
       ],
       "reasoning": "string",
       "all_verified": true
@@ -32,7 +33,7 @@ Success `200`:
 }
 ```
 Rules:
-- The agent's JSON is validated and cleaned per `agent-output-contract.md`; `verified`, `verify_notes`, `verify_text`, `found_lines` and `all_verified` are added by the server (`citation-checker.md`). Agent text is otherwise passed through unchanged.
+- The agent's JSON is validated and cleaned per `agent-output-contract.md`; `verified`, `verify_notes`, `verify_text`, `found_lines`, `source_lines` (the real lines of the pinned file, for display) and `all_verified` are added by the server (`citation-checker.md`). Agent text is otherwise passed through unchanged.
 - The request is logged (`storage-schema.sql`) **before the response is returned**, and `id` is that row's id. Failures are logged too.
 - Only one agent call runs at a time. If another is running, the request waits up to **60 s** for its turn.
 
@@ -44,7 +45,7 @@ Errors:
 | 429 | `busy` | waited 60 s and the previous call was still running; `retry_after` 30 |
 | 429 | `rate_limited` | Foundry returned 429 (tokens-per-minute quota), or the per-client limit was exceeded; `retry_after` from the upstream header, else 60 |
 | 502 | `agent_error` | Foundry unreachable, timed out (90 s), or returned a non-429 error |
-| 502 | `bad_output` | the agent's output cannot be parsed or validated; the raw text is kept in the log (`meta.raw`) |
+| 502 | `bad_output` | the agent's output cannot be parsed or validated; the raw text (first 4,000 characters) is kept in the log (`meta.raw`) and also returned as `raw` in the error body so the UI can offer "Show raw reply" (plain text) |
 
 ## POST /api/verdict
 Request: `{ "id": 17, "verdict": "correct" | "partial" | "wrong", "note": "optional, at most 1000 characters" }`.

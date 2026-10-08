@@ -3,6 +3,7 @@
 CodeCompass lets a non-technical PM ask what business rules a codebase enforces (first: which payment methods are available in which countries)
 and returns plain-English rules with **verifiable file:line citations**, plus an honest "where I looked and did not find it" section.
 The brain is an Azure AI Foundry agent; this app is a thin shell around it. Course capstone (AI PM course). Demo due 2026-10-10.
+**Demo scope: ONE company's codebase (Hyperswitch) with PM-style rules questions.** The second codebase (active_merchant) lives in a separate index as a later generalisation test and is not shown in the demo.
 
 Workflow style inspired by [sachin0034-tech/dev-os](https://github.com/sachin0034-tech/dev-os) (staged, approval-gated, skills as slash commands).
 
@@ -22,10 +23,10 @@ Workflow style inspired by [sachin0034-tech/dev-os](https://github.com/sachin003
 | 1 | Product definition | `docs/CodeCompass_PRD.md` | done (PRD Weeks 1-4) |
 | 2 | Engineering plan | `/engineering-planner` -> `docs/engineering/engineering-doc.md` | done |
 | 3 | Implementation specs | `/implementation-specs` -> `docs/specs/`, `.env.example` | done (tested, approved) |
-| 4 | Foundry backend (index + agent) | `ingest/`, `scripts/`, `prompts/`; agent `Codecompass-agent` v4 | done; prompt v2 pending |
-| 5 | Frontend setup | `/frontend-setup` -> `web/` (Next.js) and `server/` (FastAPI) | in progress |
-| 6 | Feature implementation | build to `docs/spec.md`; apply `/design-system` to all UI | not started |
-| 7 | Evaluation | `/honesty-eval`, `/verify-absence` -> `eval/results/` | in progress (first run done) |
+| 4 | Foundry backend (index + agent) | `ingest/`, `scripts/`, `prompts/`; agent `Codecompass-agent` v6 on the Hyperswitch-only store `codecompass-hyperswitch` (894 chunks) | done; prompt v2 pending |
+| 5 | Frontend setup | `/frontend-setup` -> `web/` (Next.js) and `server/` (FastAPI) | done (79 server tests + 17 scorer tests) |
+| 6 | Feature implementation | build to `docs/spec.md`; apply `/design-system` to all UI | v0.1 UI done; polish ongoing |
+| 7 | Evaluation | `/honesty-eval`, `/verify-absence` -> `eval/results/` | live run done on v6: 11 of 12 answerable pass, 9 of 9 absent-concept runs pass, 0 unverified citations; larger set and repeats pending |
 | 8 | Security | `/security-foundation` -> `docs/security/security-plan.md` | not started |
 | 9 | Run and publish | local demo; GitHub release | not started |
 
@@ -54,7 +55,7 @@ Skills live in `skills/<name>/SKILL.md`. Our own: `/verify-absence`, `/honesty-e
 
 ## Layout
 `docs/` PRD, spec, design, engineering, security | `skills/` slash commands | `prompts/` agent system prompts | `ingest/` chunker | `scripts/` Foundry helpers |
-`eval/` trick questions, runners, results | `logs/` local SQLite log of every request | `server/` FastAPI | `web/` Next.js | `demo/` terminal demo | `LEARNINGS.md` build log.
+`eval/` question sets (`hs_questions.json`), scorer (`score_hs.py`), runners, results | `logs/` local SQLite log of every request | `server/` FastAPI | `web/` Next.js | `demo/` terminal demo | `LEARNINGS.md` build log.
 
 ## Commands
 - Python env: `python3 -m venv .venv && source .venv/bin/activate && pip install azure-ai-projects azure-identity fastapi uvicorn`

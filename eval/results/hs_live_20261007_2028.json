@@ -1,0 +1,1719 @@
+{
+  "answers": [
+    {
+      "id": "R1",
+      "run": 1,
+      "question": "Where can we offer Affirm through Stripe, and in which currency?",
+      "status": 200,
+      "seconds": 15.2,
+      "response": {
+        "id": 10,
+        "answer": "The codebase only enables Affirm via the Stripe connector for the United States and only in USD. I could not find any other country or currency settings for Affirm through Stripe in the searched config files.",
+        "rules": [
+          {
+            "rule": "Affirm is available through the Stripe connector in the US, using USD.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 712,
+                "line_end": 714,
+                "evidence": "affirm = { country = \"US\", currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  713,
+                  713
+                ],
+                "source_lines": [
+                  {
+                    "n": 713,
+                    "text": "affirm = { country = \"US\", currency = \"USD\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 653,
+                "line_end": 655,
+                "evidence": "affirm = { country = \"US\", currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  654,
+                  654
+                ],
+                "source_lines": [
+                  {
+                    "n": 654,
+                    "text": "affirm = { country = \"US\", currency = \"USD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Both the production and development Stripe pm_filters entries explicitly list affirm with country = \"US\" and currency = \"USD\", indicating Affirm via Stripe is configured only for USD in the United States.",
+            "all_verified": true
+          },
+          {
+            "rule": "Affirm (generic pm_filters.affirm) is configured with currency USD.",
+            "category": "unknown",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 439,
+                "line_end": 440,
+                "evidence": "affirm = { currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  439,
+                  439
+                ],
+                "source_lines": [
+                  {
+                    "n": 439,
+                    "text": "affirm = { currency = \"USD\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/config.example.toml",
+                "line_start": 829,
+                "line_end": 830,
+                "evidence": "affirm = { currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  830,
+                  830
+                ],
+                "source_lines": [
+                  {
+                    "n": 830,
+                    "text": "affirm = { currency = \"USD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The dedicated pm_filters.affirm section in multiple config files sets affirm to currency = \"USD\", but these entries do not specify a connector (Stripe vs other), so they confirm USD as the currency for Affirm generally but do not attribute it to Stripe specifically.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.stripe]",
+              "config/development.toml [pm_filters.stripe]",
+              "config/deployments/production.toml [pm_filters.affirm]",
+              "config/development.toml [pm_filters.affirm]",
+              "config/config.example.toml [pm_filters.affirm]"
+            ],
+            "not_found": "No entries showing Affirm via the Stripe connector for any country other than US, and no Stripe entry listing any currency other than USD for Affirm. Also no explicit mapping explaining whether pm_filters.affirm (the standalone section) applies to Stripe or other connectors.",
+            "suggested_follow_up": "Ask engineering to confirm whether the pm_filters.affirm section is used by Stripe or only by other connectors, and whether Affirm support should be enabled for additional countries/currencies (if so, request the intended country and currency list and where to update it)."
+          }
+        ],
+        "meta": {
+          "seconds": 15.1,
+          "input_tokens": 14167,
+          "output_tokens": 1045,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R2",
+      "run": 1,
+      "question": "Which countries and currencies is Cash App Pay available in on Stripe?",
+      "status": 200,
+      "seconds": 8.6,
+      "response": {
+        "id": 11,
+        "answer": "The code shows Cash App Pay is enabled only for US merchants and only in USD. I did not find any other countries or currencies listed for Cash App Pay in the Stripe filter configuration files I inspected.",
+        "rules": [
+          {
+            "rule": "Cash App Pay (cashapp) is available in country US and currency USD.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 656,
+                "line_end": 656,
+                "evidence": "cashapp = { country = \"US\", currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  656,
+                  656
+                ],
+                "source_lines": [
+                  {
+                    "n": 656,
+                    "text": "cashapp = { country = \"US\", currency = \"USD\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 716,
+                "line_end": 716,
+                "evidence": "cashapp = { country = \"US\", currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  716,
+                  716
+                ],
+                "source_lines": [
+                  {
+                    "n": 716,
+                    "text": "cashapp = { country = \"US\", currency = \"USD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Both the development and production Stripe pm_filters configuration explicitly list cashapp with country \"US\" and currency \"USD\", which indicates the configured availability.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml [pm_filters.stripe]",
+              "config/deployments/production.toml [pm_filters.stripe]",
+              "other pm_filters sections in config files returned by the search"
+            ],
+            "not_found": "Any other countries or currencies for Cash App Pay, or connector-level runtime checks that would expand or restrict availability beyond these static config entries.",
+            "suggested_follow_up": "Ask engineering to confirm there are no additional runtime feature flags, account-level settings, or Stripe account configurations that change Cash App Pay availability beyond the static pm_filters entries in these config files."
+          }
+        ],
+        "meta": {
+          "seconds": 8.5,
+          "input_tokens": 15204,
+          "output_tokens": 648,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R3",
+      "run": 1,
+      "question": "Where is EPS available on Stripe?",
+      "status": 200,
+      "seconds": 15.7,
+      "response": {
+        "id": 12,
+        "answer": "In the codebase EPS via the Stripe connector is enabled for Austria (country code AT) and only in EUR. The Stripe EPS config also lists the specific Austrian banks that Stripe supports for EPS in the bank_config section.",
+        "rules": [
+          {
+            "rule": "EPS is available on Stripe in Austria (AT) with currency EUR.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 712,
+                "line_end": 720,
+                "evidence": "eps = { country = \"AT\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  717,
+                  717
+                ],
+                "source_lines": [
+                  {
+                    "n": 717,
+                    "text": "eps = { country = \"AT\", currency = \"EUR\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 644,
+                "line_end": 644,
+                "evidence": "eps = { country = \"AT\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  644,
+                  644
+                ],
+                "source_lines": [
+                  {
+                    "n": 644,
+                    "text": "eps = { country = \"AT\", currency = \"EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Both the Stripe pm_filters entries explicitly set eps = { country = \"AT\", currency = \"EUR\" }, which indicates Stripe's EPS is enabled for Austria and limited to EUR.",
+            "all_verified": true
+          },
+          {
+            "rule": "Stripe's EPS configuration enumerates the supported Austrian banks for EPS.",
+            "category": "technical",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 606,
+                "line_end": 606,
+                "evidence": "stripe = { banks = \"arzte_und_apotheker_bank,austrian_anadi_bank_ag,bank_austria,bankhaus_carl_spangler,bankhaus_schelhammer_und_schattera_ag,bawag_psk_ag,bks_bank_ag,brull_kallmus_bank_ag,btv_vier_lander_bank,capital_bank_grawe_gruppe_ag,dolomitenbank,easybank_ag,erste_bank_und_sparkassen,hypo_alpeadriabank_international_ag,hypo_noe_lb_fur_niederosterreich_u_wien,hypo_oberosterreich_salzburg_steiermark,hypo_tirol_bank_ag,hypo_vorarlberg_bank_ag,hypo_bank_burgenland_aktiengesellschaft,marchfelder_bank,oberbank_ag,raiffeisen_bankengruppe_osterreich,schoellerbank_ag,sparda_bank_wien,volksbank_gruppe,volkskreditbank_ag,vr_bank_braunau\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  606,
+                  606
+                ],
+                "source_lines": [
+                  {
+                    "n": 606,
+                    "text": "stripe = { banks = \"arzte_und_apotheker_bank,austrian_anadi_bank_ag,bank_austria,bankhaus_carl_spangler,bankhaus_schelhammer_und_schattera_ag,bawag_psk_ag,bks_bank_ag,brull_kallmus_bank_ag,btv_vier_la \u2026"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The bank_config.eps section includes a stripe = { banks = \"...\" } entry listing specific Austrian banks, showing which banks Stripe's EPS will present/support.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.stripe section)",
+              "config/development.toml (pm_filters.stripe and bank_config.eps sections)",
+              "config/config.example.toml (pm_filters.nuvei/others)"
+            ],
+            "not_found": "No other country or currency entries for EPS under the Stripe connector were found in the searched files; I did not find any Stripe EPS entries that enable EPS outside Austria or list additional currencies for Stripe EPS.",
+            "suggested_follow_up": "Ask engineering to confirm whether Stripe EPS is intentionally restricted to Austria/EUR in production and whether any runtime feature flags or merchant-level settings can enable EPS for other countries or currencies."
+          }
+        ],
+        "meta": {
+          "seconds": 15.7,
+          "input_tokens": 13890,
+          "output_tokens": 1388,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R4",
+      "run": 1,
+      "question": "Why can't we use Giropay on Stripe outside Germany?",
+      "status": 200,
+      "seconds": 11.1,
+      "response": {
+        "id": 13,
+        "answer": "The codebase limits Giropay to Germany: the payment method is configured with country = \"DE\" and currency = \"EUR\" for Stripe (and other connectors). The repository shows no code-level explanation for why \u2014 only the country/currency restriction. If you need the reason (commercial, regulatory, or Stripe capability), ask engineering to check Stripe account settings or business rules outside the config files.",
+        "rules": [
+          {
+            "rule": "Giropay is enabled only for Germany (country = \"DE\") and requires EUR when routed via Stripe.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 718,
+                "line_end": 718,
+                "evidence": "giropay = { country = \"DE\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  718,
+                  718
+                ],
+                "source_lines": [
+                  {
+                    "n": 718,
+                    "text": "giropay = { country = \"DE\", currency = \"EUR\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 658,
+                "line_end": 658,
+                "evidence": "giropay = { country = \"DE\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  658,
+                  658
+                ],
+                "source_lines": [
+                  {
+                    "n": 658,
+                    "text": "giropay = { country = \"DE\", currency = \"EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Both the production and development configuration files explicitly define Giropay with country = \"DE\" and currency = \"EUR\", which enforces availability only in Germany for Stripe.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.stripe]",
+              "config/development.toml [pm_filters.stripe]",
+              "config/deployments/production.toml [pm_filters.default]",
+              "config/deployments/production.toml [pm_filters.worldline]",
+              "config/development.toml [pm_filters.worldline]"
+            ],
+            "not_found": "No explanation in the code/config files about why Giropay is restricted to Germany (e.g., regulatory text, Stripe capability flags, or business rationale).",
+            "suggested_follow_up": "Ask engineering or payments ops to check: (1) Stripe account/product settings for Giropay availability; (2) whether this is a deliberate commercial decision in a separate policy document; or (3) if there are regulatory/contract reasons tied to the connector that aren\u2019t captured in these TOML configs."
+          }
+        ],
+        "meta": {
+          "seconds": 11.0,
+          "input_tokens": 13872,
+          "output_tokens": 908,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R5",
+      "run": 1,
+      "question": "Which countries can use iDEAL on Stripe?",
+      "status": 200,
+      "seconds": 12.5,
+      "response": {
+        "id": 14,
+        "answer": "The code shows iDEAL is configured for the Netherlands (NL) with currency EUR. For Stripe specifically the config lists the Dutch banks that Stripe will use for iDEAL, but I did not find a connector source file that states anything different for other countries.",
+        "rules": [
+          {
+            "rule": "iDEAL is available for country NL with currency EUR.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 646,
+                "line_end": 646,
+                "evidence": "ideal = { country = \"NL\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  646,
+                  646
+                ],
+                "source_lines": [
+                  {
+                    "n": 646,
+                    "text": "ideal = { country = \"NL\", currency = \"EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The pm_filters.default configuration explicitly sets ideal's country to NL and currency to EUR, which indicates availability is limited to that country/currency combination.",
+            "all_verified": true
+          },
+          {
+            "rule": "For Stripe, iDEAL is configured with a list of Dutch banks (i.e. the Stripe implementation uses those Dutch banks for iDEAL).",
+            "category": "technical",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 609,
+                "line_end": 610,
+                "evidence": "[bank_config.ideal]\nstripe = { banks = \"abn_amro,asn_bank,bunq,handelsbanken,ing,knab,moneyou,rabobank,regiobank,revolut,sns_bank,triodos_bank,van_lanschot\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  609,
+                  610
+                ],
+                "source_lines": [
+                  {
+                    "n": 609,
+                    "text": "[bank_config.ideal]"
+                  },
+                  {
+                    "n": 610,
+                    "text": "stripe = { banks = \"abn_amro,asn_bank,bunq,handelsbanken,ing,knab,moneyou,rabobank,regiobank,revolut,sns_bank,triodos_bank,van_lanschot\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The bank_config.ideal section lists Stripe with a set of Dutch banks, showing which banks Stripe will use for iDEAL.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml (pm_filters.default and [bank_config.ideal])",
+              "config/deployments/production.toml (pm_filters.* sections)",
+              "config/config.example.toml (pm_filters.* sections)"
+            ],
+            "not_found": "I did not find a Stripe-specific pm_filters entry that explicitly states ideal = { country = \"NL\", currency = \"EUR\" } (i.e., a direct pm_filters.stripe.ideal line), nor did I find connector source code that enforces the country-level rule for the Stripe connector.",
+            "suggested_follow_up": "Ask engineering to confirm whether Stripe's connector enforces iDEAL availability at runtime (and whether any exceptions exist), and to point to the connector file or deployment config that enforces iDEAL = NL for Stripe if one exists."
+          }
+        ],
+        "meta": {
+          "seconds": 12.4,
+          "input_tokens": 13273,
+          "output_tokens": 1245,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R6",
+      "run": 1,
+      "question": "Why is Klarna on Stripe available in Germany but not in India?",
+      "status": 200,
+      "seconds": 13.7,
+      "response": {
+        "id": 15,
+        "answer": "The code config enables Klarna for Stripe in Germany because Klarna is listed for the Stripe payment-method filter including DE; India is not listed for Klarna on Stripe and Stripe is not configured as a Klarna (pay_later) connector. I could not find any code comment or file that explains the business or regulatory reason why India was excluded \u2014 only the configuration values themselves.",
+        "rules": [
+          {
+            "rule": "Klarna is enabled for Stripe in the countries listed (which include DE) and only for the currencies listed in that config entry.",
+            "category": "technical",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 721,
+                "line_end": 721,
+                "evidence": "klarna = { country = \"AU,AT,BE,CA,CZ,DK,FI,FR,DE,GR,IE,IT,NL,NZ,NO,PL,PT,ES,SE,CH,GB,US\", currency = \"AUD,CAD,CHF,CZK,DKK,EUR,GBP,NOK,NZD,PLN,SEK,USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  721,
+                  721
+                ],
+                "source_lines": [
+                  {
+                    "n": 721,
+                    "text": "klarna = { country = \"AU,AT,BE,CA,CZ,DK,FI,FR,DE,GR,IE,IT,NL,NZ,NO,PL,PT,ES,SE,CH,GB,US\", currency = \"AUD,CAD,CHF,CZK,DKK,EUR,GBP,NOK,NZD,PLN,SEK,USD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "This line is the Stripe-specific pm_filters entry that lists which countries and currencies Klarna via Stripe is allowed for, and it includes DE but does not include IN.",
+            "all_verified": true
+          },
+          {
+            "rule": "The pay_later.klarna connector list does not include Stripe (only adyen and aci are listed), so Klarna pay-later flows are not routed to Stripe.",
+            "category": "technical",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 301,
+                "line_end": 301,
+                "evidence": "pay_later.klarna.connector_list = \"adyen,aci\"",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  301,
+                  301
+                ],
+                "source_lines": [
+                  {
+                    "n": 301,
+                    "text": "pay_later.klarna.connector_list = \"adyen,aci\""
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The mandates/supported_payment_methods configuration shows which connectors implement pay_later.klarna; Stripe is not present in that connector list.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.stripe] (line 721)",
+              "config/deployments/production.toml [mandates.supported_payment_methods] (line 301)",
+              "config/development.toml [pm_filters.stripe] (lines 648-651 and nearby)",
+              "config/development.toml [pm_filters.default] (lines 638-648)"
+            ],
+            "not_found": "No file or comment explaining the business, regulatory, or commercial rationale for why India (IN) is excluded from Klarna-on-Stripe. Also no explicit mapping showing a Stripe-Klarna integration flag or explanatory note.",
+            "suggested_follow_up": "Ask engineering or product: (1) whether the omission of IN is intentional (commercial/regulatory) or an oversight; (2) whether Stripe supports Klarna in IN at all for this platform; and (3) whether the pay_later.klarna connector_list should include 'stripe' or if Klarna on Stripe is intentionally unsupported."
+          }
+        ],
+        "meta": {
+          "seconds": 13.6,
+          "input_tokens": 14956,
+          "output_tokens": 1282,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R7",
+      "run": 1,
+      "question": "Where is MB Way available on Adyen?",
+      "status": 200,
+      "seconds": 13.1,
+      "response": {
+        "id": 16,
+        "answer": "The code shows MB Way configured for the Adyen connector only in Portugal (PT) and with currency EUR. I could not find an explicit MB Way entry for Adyen in the production deployment file, so please confirm with engineering whether the production Adyen config matches development.",
+        "rules": [
+          {
+            "rule": "MB Way is available on the Adyen connector in Portugal (country = PT) and uses EUR.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 713,
+                "line_end": 716,
+                "evidence": "mb_way = { country = \"PT\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  716,
+                  716
+                ],
+                "source_lines": [
+                  {
+                    "n": 716,
+                    "text": "mb_way = { country = \"PT\", currency = \"EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "This line appears in the [pm_filters.adyen] section of the development configuration, which assigns allowed countries and currencies for Adyen payment methods.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml [pm_filters.adyen] (lines 713-716)",
+              "config/deployments/production.toml [pm_filters.adyen] (lines 416-426)",
+              "config/deployments/production.toml [pm_filters.default] (lines 359-362)",
+              "config/deployments/production.toml [pm_filters.aci] (lines 899-901)",
+              "config/config.example.toml [pm_filters.adyen] (lines 799-801)",
+              "config/development.toml [pm_filters.multisafepay] (lines 1053-1062)"
+            ],
+            "not_found": "An explicit MB Way entry under the Adyen connector in the production deployment file (production.toml) was not found in the search results. There are MB Way entries for other connectors (e.g., multisafepay, default, aci) in various files, but for Adyen only the development config shows MB Way = PT.",
+            "suggested_follow_up": "Ask engineering to confirm whether the production Adyen configuration includes MB Way and matches the development entry (PT / EUR), and if different, provide the production file path and exact lines to update documentation or product rules."
+          }
+        ],
+        "meta": {
+          "seconds": 13.1,
+          "input_tokens": 14697,
+          "output_tokens": 1346,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R8",
+      "run": 1,
+      "question": "Which countries and currencies does PayBright on Adyen support?",
+      "status": 200,
+      "seconds": 9.9,
+      "response": {
+        "id": 17,
+        "answer": "The code shows PayBright (pay_bright) on the Adyen connector is enabled only for Canada and only in CAD. I found a single definitive mapping in the production Adyen payment-method filters. I did not find any other country or currency entries for PayBright on Adyen in the searched config files.",
+        "rules": [
+          {
+            "rule": "PayBright (pay_bright) via the Adyen connector is available in Canada (CA) and supports the CAD currency.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 421,
+                "line_end": 421,
+                "evidence": "pay_bright = { country = \"CA\", currency = \"CAD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  421,
+                  421
+                ],
+                "source_lines": [
+                  {
+                    "n": 421,
+                    "text": "pay_bright = { country = \"CA\", currency = \"CAD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The pm_filters.adyen section in the production config contains a pay_bright entry that explicitly lists country = \"CA\" and currency = \"CAD\", which indicates PayBright on Adyen is restricted to Canada and CAD.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.adyen)",
+              "config/config.example.toml (pm_filters.adyen, installment_config)",
+              "config/development.toml (pm_filters.adyen, installment_config)"
+            ],
+            "not_found": "No other mappings for pay_bright / PayBright on Adyen for additional countries or currencies, and no separate documentation tying PayBright to installment_config or alternate currency lists.",
+            "suggested_follow_up": "Ask engineering to confirm there are no other environment-specific overrides (e.g., per-merchant or staging configs) that enable PayBright in other countries/currencies, and to confirm the canonical name (pay_bright vs PayBright) used across configs and connector implementations."
+          }
+        ],
+        "meta": {
+          "seconds": 9.8,
+          "input_tokens": 14974,
+          "output_tokens": 857,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R9",
+      "run": 1,
+      "question": "In which markets can customers pay with Walley on Adyen?",
+      "status": 200,
+      "seconds": 14.8,
+      "response": {
+        "id": 18,
+        "answer": "The code shows Walley is available on the Adyen connector for customers in Sweden, Norway, Denmark and Finland (currencies DKK, EUR, NOK, SEK). I found the same rule in both the production and pm_filters.adyen config files. I did not find any contradictory country list for Walley on Adyen.",
+        "rules": [
+          {
+            "rule": "Walley is enabled for country codes SE, NO, DK, FI and supports currencies DKK, EUR, NOK, SEK.",
+            "category": "unknown",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 435,
+                "line_end": 435,
+                "evidence": "walley = { country = \"SE,NO,DK,FI\", currency = \"DKK,EUR,NOK,SEK\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  435,
+                  435
+                ],
+                "source_lines": [
+                  {
+                    "n": 435,
+                    "text": "walley = { country = \"SE,NO,DK,FI\", currency = \"DKK,EUR,NOK,SEK\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 721,
+                "line_end": 721,
+                "evidence": "walley = { country = \"SE,NO,DK,FI\", currency = \"DKK,EUR,NOK,SEK\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  721,
+                  721
+                ],
+                "source_lines": [
+                  {
+                    "n": 721,
+                    "text": "walley = { country = \"SE,NO,DK,FI\", currency = \"DKK,EUR,NOK,SEK\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Both the production and development pm_filters entries explicitly list Walley with those country codes and currencies, indicating Adyen exposes Walley in those markets.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.adyen]",
+              "config/development.toml [pm_filters.adyen]",
+              "config/deployments/production.toml [pm_filters.default]",
+              "config/config.example.toml"
+            ],
+            "not_found": "I did not find any additional Adyen-specific rules that restrict Walley further by merchant, flow, or capture method, nor any mapping from country code to country name inside these files.",
+            "suggested_follow_up": "Ask engineering whether there are any runtime or merchant-specific feature flags, or Adyen account-level settings, that further restrict Walley availability beyond the listed country/currency filter."
+          }
+        ],
+        "meta": {
+          "seconds": 14.8,
+          "input_tokens": 15187,
+          "output_tokens": 917,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R10",
+      "run": 1,
+      "question": "Where is MobilePay available on Adyen?",
+      "status": 200,
+      "seconds": 12.5,
+      "response": {
+        "id": 19,
+        "answer": "The code shows MobilePay on the Adyen connector is enabled for Denmark and Finland, and allowed currencies are DKK, SEK, NOK and EUR. This appears in both development and production configuration files.",
+        "rules": [
+          {
+            "rule": "MobilePay on Adyen is available in Denmark (DK) and Finland (FI) and supports currencies DKK, SEK, NOK, EUR.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 362,
+                "line_end": 362,
+                "evidence": "mobile_pay = { country = \"DK,FI\", currency = \"DKK,SEK,NOK,EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  362,
+                  362
+                ],
+                "source_lines": [
+                  {
+                    "n": 362,
+                    "text": "mobile_pay = { country = \"DK,FI\", currency = \"DKK,SEK,NOK,EUR\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 713,
+                "line_end": 713,
+                "evidence": "mobile_pay = { country = \"DK,FI\", currency = \"DKK,SEK,NOK,EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  713,
+                  713
+                ],
+                "source_lines": [
+                  {
+                    "n": 713,
+                    "text": "mobile_pay = { country = \"DK,FI\", currency = \"DKK,SEK,NOK,EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "These configuration entries are under the pm_filters.adyen section and list the country and currency values for mobile_pay, indicating availability for the Adyen connector.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.adyen)",
+              "config/development.toml (pm_filters.adyen)",
+              "config/deployments/production.toml (pm_filters.default)",
+              "config/development.toml (pm_filters.default)"
+            ],
+            "not_found": "No additional Adyen-specific MobilePay configuration (for example region-specific toggles, flow restrictions, or allowed merchant accounts) was found beyond the country and currency list.",
+            "suggested_follow_up": "Ask engineering whether there are any runtime feature flags, merchant account mappings, or flow-level restrictions for Adyen MobilePay beyond the static country/currency entries in these config files."
+          }
+        ],
+        "meta": {
+          "seconds": 12.4,
+          "input_tokens": 15154,
+          "output_tokens": 699,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R11",
+      "run": 1,
+      "question": "Is Affirm available on Adyen, and where?",
+      "status": 200,
+      "seconds": 11.2,
+      "response": {
+        "id": 20,
+        "answer": "Yes \u2014 the codebase lists Affirm as available via the Adyen payment-method filters for US / USD. The pm_filters entries show Affirm constrained to USD (and specifically US in the Adyen section). I could not find a connector_list entry explicitly mapping Affirm to the Adyen connector (e.g., a line saying \"affirm.connector_list = 'adyen'\"). Ask engineering to confirm the connector mapping and whether this is enabled in the live Adyen integration.",
+        "rules": [
+          {
+            "rule": "Affirm is enabled for Adyen and limited to US / USD in the Adyen payment-method filters.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 375,
+                "line_end": 378,
+                "evidence": "ach = { country = \"US\", currency = \"USD\" }\naffirm = { country = \"US\", currency = \"USD\" }\nafterpay_clearpay = { country = \"AU,CA,NZ,GB,US\", currency = \"USD,AUD,CAD,NZD,GBP\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  376,
+                  378
+                ],
+                "source_lines": [
+                  {
+                    "n": 376,
+                    "text": "ach = { country = \"US\", currency = \"USD\" }"
+                  },
+                  {
+                    "n": 377,
+                    "text": "affirm = { country = \"US\", currency = \"USD\" }"
+                  },
+                  {
+                    "n": 378,
+                    "text": "afterpay_clearpay = { country = \"AU,CA,NZ,GB,US\", currency = \"USD,AUD,CAD,NZD,GBP\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The [pm_filters.adyen] section in production.toml lists affirm = { country = \"US\", currency = \"USD\" }, which indicates Affirm is available for Adyen in the US with USD currency.",
+            "all_verified": true
+          },
+          {
+            "rule": "Affirm is constrained to USD in the global Affirm payment-method filter (no country listed there).",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/config.example.toml",
+                "line_start": 829,
+                "line_end": 831,
+                "evidence": "[pm_filters.affirm]\naffirm = { currency = \"USD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "range_loose"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  829,
+                  830
+                ],
+                "source_lines": [
+                  {
+                    "n": 829,
+                    "text": "[pm_filters.affirm]"
+                  },
+                  {
+                    "n": 830,
+                    "text": "affirm = { currency = \"USD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The [pm_filters.affirm] entry in the example config sets affirm = { currency = \"USD\" }, showing Affirm is globally constrained to USD at the pm_filters.affirm level.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.adyen] (lines 375-378)",
+              "config/deployments/production.toml [pm_filters.affirm] (lines 439-440)",
+              "config/config.example.toml [pm_filters.affirm] (lines 829-831)",
+              "config/development.toml [pm_filters.adyen] and [pm_filters.affirm] (multiple lines)"
+            ],
+            "not_found": "I did not find an explicit connector mapping line that shows Affirm is assigned to the Adyen connector (for example, a line like \"affirm = { connector_list = 'adyen' }\" or \"affirm.connector_list = 'adyen'\"), nor any code/config that documents runtime enablement or live account settings for Affirm on Adyen.",
+            "suggested_follow_up": "Ask engineering: (1) whether the Adyen connector implementation supports Affirm (i.e., confirm the connector mapping and code-level support), and (2) whether Affirm via Adyen is active in production accounts or requires additional merchant onboarding/settings."
+          }
+        ],
+        "meta": {
+          "seconds": 11.1,
+          "input_tokens": 14683,
+          "output_tokens": 993,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "R12",
+      "run": 1,
+      "question": "Which countries support Flexiti?",
+      "status": 200,
+      "seconds": 9.8,
+      "response": {
+        "id": 21,
+        "answer": "The code shows Flexiti is configured to support Canada only (country code CA) and the CAD currency. I found the same setting in the example, development and production pm_filters, so there is no evidence in the codebase that Flexiti is enabled for any other country or currency.",
+        "rules": [
+          {
+            "rule": "Flexiti is enabled for country CA (Canada) and currency CAD only.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/config.example.toml",
+                "line_start": 1036,
+                "line_end": 1036,
+                "evidence": "flexiti = { country = \"CA\", currency = \"CAD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  1036,
+                  1036
+                ],
+                "source_lines": [
+                  {
+                    "n": 1036,
+                    "text": "flexiti = { country = \"CA\", currency = \"CAD\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/development.toml",
+                "line_start": 985,
+                "line_end": 985,
+                "evidence": "flexiti = { country = \"CA\", currency = \"CAD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  985,
+                  985
+                ],
+                "source_lines": [
+                  {
+                    "n": 985,
+                    "text": "flexiti = { country = \"CA\", currency = \"CAD\" }"
+                  }
+                ]
+              },
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 663,
+                "line_end": 663,
+                "evidence": "flexiti = { country = \"CA\", currency = \"CAD\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  663,
+                  663
+                ],
+                "source_lines": [
+                  {
+                    "n": 663,
+                    "text": "flexiti = { country = \"CA\", currency = \"CAD\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "Each pm_filters.flexiti entry in the configuration files explicitly sets country = \"CA\" and currency = \"CAD\", which indicates the connector is filtered to Canada/CAD.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/config.example.toml [pm_filters.flexiti]",
+              "config/development.toml [pm_filters.flexiti]",
+              "config/deployments/production.toml [pm_filters.flexiti]",
+              "config/* [connectors] entries referencing flexiti"
+            ],
+            "not_found": "No other country codes or currencies for Flexiti were found in the config files. I did not find code-level checks, per-merchant enablement flags, or runtime feature flags that might enable Flexiti in other countries.",
+            "suggested_follow_up": "Ask engineering whether Flexiti availability can be overridden per-merchant or at runtime (e.g., feature flags or merchant settings), and to confirm there are no other location-based rules elsewhere in the codebase that would allow additional countries."
+          }
+        ],
+        "meta": {
+          "seconds": 9.7,
+          "input_tokens": 15147,
+          "output_tokens": 765,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T2",
+      "run": 1,
+      "question": "What is the refund window in days for Giropay payments on Stripe?",
+      "status": 200,
+      "seconds": 11.0,
+      "response": {
+        "id": 22,
+        "answer": "I could not find any code or config in the repository that states a refund window (in days) for Giropay payments on Stripe. The code does show that Giropay is enabled for Stripe in Germany (EUR), but there is no visible rule specifying a refund-window duration.",
+        "rules": [
+          {
+            "rule": "Giropay is enabled on the Stripe connector for Germany with EUR currency.",
+            "category": "commercial",
+            "citations": [
+              {
+                "repo": "hyperswitch",
+                "file": "config/deployments/production.toml",
+                "line_start": 718,
+                "line_end": 718,
+                "evidence": "giropay = { country = \"DE\", currency = \"EUR\" }",
+                "verified": true,
+                "verify_notes": [
+                  "ok"
+                ],
+                "verify_text": "Citation verified",
+                "found_lines": [
+                  718,
+                  718
+                ],
+                "source_lines": [
+                  {
+                    "n": 718,
+                    "text": "giropay = { country = \"DE\", currency = \"EUR\" }"
+                  }
+                ]
+              }
+            ],
+            "reasoning": "The pm_filters.stripe section explicitly lists giropay with country = \"DE\" and currency = \"EUR\", which indicates availability but not refund timing rules.",
+            "all_verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (section: [pm_filters.stripe], lines 712-720)",
+              "config/deployments/production.toml (section: [pm_filters.default], lines 353-358)",
+              "config/deployments/production.toml (section: [mandates.supported_payment_methods], lines 317-323)",
+              "config/config.example.toml (section: [pm_filters.nuvei], lines 972-975)",
+              "config/development.toml (section: [pm_filters.stripe], lines 712-720)"
+            ],
+            "not_found": "No file or code snippet in the searched configuration files or sections defines a numeric refund window (in days) for Giropay payments processed via the Stripe connector.",
+            "suggested_follow_up": "Ask engineering to point to the Stripe connector implementation or payment-method-specific policy file that defines refund windows (search the Stripe connector code, payment-method handlers, or any rules/mapping files for 'refund_window', 'refund_days', or 'refund_window_days'); if not present in repo, request the operational policy or Stripe-hosted documentation the team follows for Giropay refunds."
+          }
+        ],
+        "meta": {
+          "seconds": 10.9,
+          "input_tokens": 14258,
+          "output_tokens": 1024,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "H-T1",
+      "run": 1,
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "status": 200,
+      "seconds": 9.9,
+      "response": {
+        "id": 23,
+        "answer": "I could not find a dedicated list or rule in the code that says which countries Hyperswitch explicitly blocks for sanctions reasons. The configuration files contain many per-connector allowed/blocked country lists (payment-method filters), but I did not find a file/setting labelled for sanctions or a clear sanction-block list.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (sections: [pm_filters.nmi], [pm_filters.nuvei], [pm_filters.wellsfargo], [pm_filters.powertranz], [pm_filters.multisafepay], [pm_filters.tesouro]) \u2014 examples: , , , , , ",
+              "config/config.example.toml (section: [pm_filters.nmi], [pm_filters.powertranz]) \u2014 examples: , ",
+              "config/development.toml (sections: [pm_filters.nmi], [pm_filters.powertranz], [pm_filters.wellsfargo]) \u2014 examples: , , "
+            ],
+            "not_found": "No explicit 'sanctions' or 'sanctioned_countries' list or a top-level blocklist labelled for sanctions reasons was found in the searched configuration files. The files contain many connector-specific country lists (allowed/unsupported countries) but none explicitly attributed to sanctions blocking.",
+            "suggested_follow_up": "Ask engineering or the repo owner where sanctions blocking is implemented (possible places: a dedicated 'sanctions' config file, an ACL/middleware module, or an external service). Provide the team the example file paths above and request the exact config key or code location that contains the sanctions blocklist."
+          }
+        ],
+        "meta": {
+          "seconds": 9.8,
+          "input_tokens": 11954,
+          "output_tokens": 855,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T1",
+      "run": 1,
+      "question": "What minimum customer age is required to use Klarna on Stripe?",
+      "status": 200,
+      "seconds": 11.9,
+      "response": {
+        "id": 24,
+        "answer": "I could not find any rule in the code that states a minimum customer age for using Klarna via Stripe. The configuration contains which countries/currencies Klarna is enabled for and the required customer fields for Klarna on Stripe, but no age restriction is present in the files I searched.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml (pm_filters.stripe) \u2014 shows Klarna enabled countries/currencies ",
+              "config/development.toml (pm_filters.default & pm_filters.stripe) \u2014 other Klarna availability entries  ",
+              "config/deployments/production.toml (pm_filters.stripe & pm_filters.default & pm_filters.aci) \u2014 Klarna availability in production configs   ",
+              "config/payment_required_fields_v2.toml (required_fields.pay_later.klarna.fields.Stripe) \u2014 required billing/shipping fields for Klarna on Stripe "
+            ],
+            "not_found": "No file or section contained any explicit minimum customer age, age limit, date-of-birth requirement, or related validation rule for Klarna when routed to the Stripe connector.",
+            "suggested_follow_up": "Ask engineering or the connector owner whether age verification or a minimum age is enforced elsewhere (for example: in another config file, in Stripe/Klarna account settings, in runtime validation code, or in an external policy). If they think it should be enforced in code, ask them to point to the file or service that contains the DOB/age validation, or to add a clear config entry (e.g., 'klarna.min_age') so it can be discovered in the repository."
+          }
+        ],
+        "meta": {
+          "seconds": 11.9,
+          "input_tokens": 28491,
+          "output_tokens": 739,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T3",
+      "run": 1,
+      "question": "What cooling-off period applies to Afterpay payments in the UK?",
+      "status": 200,
+      "seconds": 13.0,
+      "response": {
+        "id": 25,
+        "answer": "I could not find any code or config that sets a UK cooling-off period for Afterpay/Clearpay. The code does reference afterpay_clearpay as available in GB (so the payment method is present), but no cooling-off timeframe is defined in the files I searched.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.default -> afterpay_clearpay)",
+              "config/config.example.toml (installment and required_fields.pay_later.afterpay_clearpay)",
+              "config/payment_required_fields_v2.toml (required_fields.pay_later.afterpay_clearpay.fields.*)",
+              "config/development.toml (pm_filters and save_payment_method_on_session.unsupported_payment_methods)"
+            ],
+            "not_found": "No explicit cooling-off period (number of days or cancellation window) for Afterpay/Clearpay in the UK was present in those files.",
+            "suggested_follow_up": "Ask engineering or the payments team where consumer-protection rules (cooling-off/cancellation windows) are implemented \u2014 e.g., check connector-specific policy files, merchant-facing policy configuration, or the Afterpay/Clearpay integration docs stored in the repo or a separate policy service."
+          }
+        ],
+        "meta": {
+          "seconds": 12.9,
+          "input_tokens": 15757,
+          "output_tokens": 1462,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "H-T1",
+      "run": 2,
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "status": 200,
+      "seconds": 10.4,
+      "response": {
+        "id": 26,
+        "answer": "I could not find a central \u201csanctions\u201d block or a named sanctions list in the code/config files returned by my search. I searched the configuration files (production and example) for country-blocking rules but only found connector-specific allowed/blocked country lists (pm_filters) \u2014 nothing labelled explicitly as a sanctions block. Please ask engineering where the global sanctions list is stored (config key name or service) or point me to a file that mentions \u201csanctions\u201d so I can extract the exact countries.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml [pm_filters.* sections shown in search results]   ",
+              "config/config.example.toml [pm_filters.* sections shown in search results]  ",
+              "config/development.toml [pm_filters.* sections shown in search results]  "
+            ],
+            "not_found": "No file or config key explicitly named \u201csanctions\u201d, \u201csanctioned_countries\u201d, or similar was present in the search results; I therefore could not attribute any global sanctions-based country block to Hyperswitch from the provided code.",
+            "suggested_follow_up": "Ask engineering where the global sanctions list is maintained (config file path or service), or provide a file or search term that contains the word \u201csanction\u201d so I can extract the exact list; alternatively, confirm whether sanctions are enforced by an external service (e.g. a sanctions-check microservice) and where that code/config lives."
+          }
+        ],
+        "meta": {
+          "seconds": 10.3,
+          "input_tokens": 23893,
+          "output_tokens": 681,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T1",
+      "run": 2,
+      "question": "What minimum customer age is required to use Klarna on Stripe?",
+      "status": 200,
+      "seconds": 8.9,
+      "response": {
+        "id": 27,
+        "answer": "I could not find any code or configuration in the repository that specifies a minimum customer age for using Klarna via the Stripe connector. The config files show which countries and currencies Klarna is enabled for, but no age restriction is present in those files.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml [pm_filters.stripe] (lines showing klarna country/currency) - PATH: config/development.toml LINES: 648-651 ",
+              "config/deployments/production.toml [pm_filters.stripe] (lines showing klarna country/currency) - PATH: config/deployments/production.toml LINES: 718-722 ",
+              "config/deployments/production.toml [pm_filters.aci] (lines showing klarna country/currency) - PATH: config/deployments/production.toml LINES: 906-910 ",
+              "config/development.toml [pm_filters.default] (lines showing klarna country/currency) - PATH: config/development.toml LINES: 638-641 ",
+              "config/deployments/production.toml [pm_filters.default] (lines showing klarna country/currency) - PATH: config/deployments/production.toml LINES: 359-361 ",
+              "config/config.example.toml [pm_filters.nuvei] (example klarna settings) - PATH: config/config.example.toml LINES: 972-976 ",
+              "config/development.toml [pm_filters.nuvei] (example klarna settings) - PATH: config/development.toml LINES: 873-876 "
+            ],
+            "not_found": "No lines or sections that state a minimum customer age for using Klarna on Stripe were found in the configuration files or the tokenization sections returned by the search results.",
+            "suggested_follow_up": "Ask engineering to point to the repository location that enforces age checks for payment methods (search for terms like \"age\", \"minimum_age\", \"dob\", \"birthdate\", or \"Klarna\" in connector/validation code). If the check is implemented by the Klarna/Stripe SDK or by merchants' external settings, ask them to confirm where that external policy is recorded (merchant account settings or external provider docs)."
+          }
+        ],
+        "meta": {
+          "seconds": 8.9,
+          "input_tokens": 15322,
+          "output_tokens": 797,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T3",
+      "run": 2,
+      "question": "What cooling-off period applies to Afterpay payments in the UK?",
+      "status": 200,
+      "seconds": 13.6,
+      "response": {
+        "id": 28,
+        "answer": "I could not find any code or configuration in the repository that states a cooling-off period for Afterpay (Afterpay/Clearpay) payments in the UK. The available config files list where Afterpay/Clearpay is enabled and required fields for pay-later flows, but none mention a consumer cooling-off period or refund/return window.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.default and pm_filters.adyen entries showing afterpay_clearpay availability in GB and currencies)  ",
+              "config/deployments/production.toml (pm_filters.adyen showing afterpay_clearpay country/currency lists) ",
+              "config/development.toml (pm_filters entries for afterpay_clearpay)  ",
+              "config/payment_required_fields_v2.toml (required fields for pay_later.afterpay_clearpay for Stripe and Adyen)  ",
+              "config/config.example.toml (example pm_filters and pay_later related config)  "
+            ],
+            "not_found": "No lines or configuration that define a 'cooling-off period', 'cooling off', 'cooling-off', refund window, statutory cancellation period, or any Afterpay/Clearpay UK consumer-time limits were found in the searched files.",
+            "suggested_follow_up": "Ask engineering or Legal for (a) the merchant integration or product spec that maps consumer protections to pay-later flows, (b) connector-specific docs for Afterpay/Clearpay used by the platform (e.g., Stripe/Adyen connector settings), or (c) merchant-facing refund/cancellation policy text stored outside this codebase. If you want, I can search additional files if you point me to other config directories or docs in the repo."
+          }
+        ],
+        "meta": {
+          "seconds": 13.5,
+          "input_tokens": 27834,
+          "output_tokens": 890,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "H-T1",
+      "run": 3,
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "status": 200,
+      "seconds": 12.1,
+      "response": {
+        "id": 29,
+        "answer": "I could not find any explicit \u201csanctions\u201d block list or code that says which countries are blocked for sanctions reasons. The repository contains connector-specific allowed-country lists (pm_filters) in config files, but no file or section that labels a list as \u2018sanctions\u2019 or \u2018sanctions_blocked_countries\u2019. For example, pm_filters.nmi shows a long allowed-country list in the config, but it is not identified as a sanctions block list .",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/config.example.toml ([pm_filters.*] sections)",
+              "config/deployments/production.toml ([pm_filters.*] sections)",
+              "config/development.toml ([pm_filters.*] sections)"
+            ],
+            "not_found": "No explicit list or code labeled as 'sanctions', 'sanctioned_countries', 'sanctions_block', or similar that states which countries Hyperswitch blocks for sanctions reasons. The files only contain per-connector allowed-country lists (pm_filters) without a sanctions label.",
+            "suggested_follow_up": "Ask engineering where sanctions filtering is implemented (if anywhere). Specifically: (1) point them to the config files above and ask whether sanctions are enforced elsewhere (database, external service, or a different config path); (2) request the file/path or feature flag name that contains the sanctioned-country list; (3) ask whether any connector-level pm_filters are intended to implement sanctions filtering."
+          }
+        ],
+        "meta": {
+          "seconds": 12.0,
+          "input_tokens": 12368,
+          "output_tokens": 873,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T1",
+      "run": 3,
+      "question": "What minimum customer age is required to use Klarna on Stripe?",
+      "status": 200,
+      "seconds": 9.3,
+      "response": {
+        "id": 30,
+        "answer": "I could not find any rule in the codebase that specifies a minimum customer age to use Klarna on Stripe. The configuration files list where Klarna is enabled by country and currency, but do not contain an age restriction. You should ask engineering where age/eligibility checks live (Stripe integration code or Klarna-specific connector) if you need an enforceable minimum age.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/development.toml (sections: [pm_filters.stripe], [pm_filters.default], [pm_filters.nuvei]) - PATH: config/development.toml LINES: 638-651, 640-641, 648-651",
+              "config/deployments/production.toml (section: [pm_filters.stripe], [pm_filters.default]) - PATH: config/deployments/production.toml LINES: 718-728, 359-361",
+              "config/config.example.toml (sections: [pm_filters.adyen], [pm_filters.nuvei], [tokenization]) - PATH: config/config.example.toml LINES: 672-699, 794-812, 972-975"
+            ],
+            "not_found": "No lines or files specifying a minimum customer age for using Klarna with Stripe were found in these configuration files or example configs.",
+            "suggested_follow_up": "Ask engineering which component enforces age/eligibility for Klarna (e.g., Stripe connector implementation, Klarna connector, or frontend validation), and request the exact code file or configuration key where a minimum_age or eligibility rule is defined."
+          }
+        ],
+        "meta": {
+          "seconds": 9.3,
+          "input_tokens": 15281,
+          "output_tokens": 565,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    },
+    {
+      "id": "D-T3",
+      "run": 3,
+      "question": "What cooling-off period applies to Afterpay payments in the UK?",
+      "status": 200,
+      "seconds": 8.4,
+      "response": {
+        "id": 31,
+        "answer": "I could not find any code or configuration in the repository that states a cooling-off period for Afterpay payments in the UK. The config files show Afterpay/Clearpay is enabled for GB, but there is no cooling-off / return-period policy text or numeric period defined in the searched files.",
+        "rules": [],
+        "gaps": [
+          {
+            "looked_in": [
+              "config/deployments/production.toml (pm_filters.default showing afterpay_clearpay available for GB) ",
+              "config/deployments/production.toml (pm_filters.nuvei showing afterpay_clearpay availability) ",
+              "config/config.example.toml (pay_later required fields for afterpay_clearpay) ",
+              "config/payment_required_fields_v2.toml (required fields for afterpay_clearpay) ",
+              "config/development.toml (save_payment_method_on_session.unsupported_payment_methods mentions afterpay_clearpay) "
+            ],
+            "not_found": "No file, connector implementation, or configuration in the searched code declares a cooling-off period (number of days or policy text) for Afterpay/Clearpay in the UK.",
+            "suggested_follow_up": "Ask engineering where consumer-facing policy text is stored (merchant docs, offer engine, or a different config file), or ask which connector implementation enforces Afterpay/Clearpay policy so they can check that connector's integration code or the external Afterpay/Clearpay merchant agreement for the cooling-off/return period."
+          }
+        ],
+        "meta": {
+          "seconds": 8.4,
+          "input_tokens": 15441,
+          "output_tokens": 742,
+          "agent_version": 6,
+          "prompt_version": "system_v1"
+        }
+      }
+    }
+  ],
+  "scored": {
+    "R1": {
+      "kind": "answerable",
+      "question": "Where can we offer Affirm through Stripe, and in which currency?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 713
+        },
+        {
+          "file": "config/development.toml",
+          "line": 654
+        }
+      ],
+      "different_values": [],
+      "rules": 2,
+      "rules_not_matching": 1,
+      "unverified_citations": 0
+    },
+    "R2": {
+      "kind": "answerable",
+      "question": "Which countries and currencies is Cash App Pay available in on Stripe?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/development.toml",
+          "line": 656
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 716
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R3": {
+      "kind": "answerable",
+      "question": "Where is EPS available on Stripe?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 717
+        }
+      ],
+      "different_values": [],
+      "rules": 2,
+      "rules_not_matching": 1,
+      "unverified_citations": 0
+    },
+    "R4": {
+      "kind": "answerable",
+      "question": "Why can't we use Giropay on Stripe outside Germany?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 718
+        },
+        {
+          "file": "config/development.toml",
+          "line": 658
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R5": {
+      "kind": "answerable",
+      "question": "Which countries can use iDEAL on Stripe?",
+      "verdict": "MISS",
+      "matched": [],
+      "different_values": [],
+      "rules": 2,
+      "rules_not_matching": 2,
+      "unverified_citations": 0
+    },
+    "R6": {
+      "kind": "answerable",
+      "question": "Why is Klarna on Stripe available in Germany but not in India?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 721
+        }
+      ],
+      "different_values": [],
+      "rules": 2,
+      "rules_not_matching": 1,
+      "unverified_citations": 0
+    },
+    "R7": {
+      "kind": "answerable",
+      "question": "Where is MB Way available on Adyen?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/development.toml",
+          "line": 716
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R8": {
+      "kind": "answerable",
+      "question": "Which countries and currencies does PayBright on Adyen support?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 421
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R9": {
+      "kind": "answerable",
+      "question": "In which markets can customers pay with Walley on Adyen?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 435
+        },
+        {
+          "file": "config/development.toml",
+          "line": 721
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R10": {
+      "kind": "answerable",
+      "question": "Where is MobilePay available on Adyen?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/development.toml",
+          "line": 713
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "R11": {
+      "kind": "answerable",
+      "question": "Is Affirm available on Adyen, and where?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/deployments/production.toml",
+          "line": 377
+        }
+      ],
+      "different_values": [],
+      "rules": 2,
+      "rules_not_matching": 1,
+      "unverified_citations": 0
+    },
+    "R12": {
+      "kind": "answerable",
+      "question": "Which countries support Flexiti?",
+      "verdict": "PASS",
+      "matched": [
+        {
+          "file": "config/config.example.toml",
+          "line": 1036
+        },
+        {
+          "file": "config/development.toml",
+          "line": 985
+        },
+        {
+          "file": "config/deployments/production.toml",
+          "line": 663
+        }
+      ],
+      "different_values": [],
+      "rules": 1,
+      "rules_not_matching": 0,
+      "unverified_citations": 0
+    },
+    "D-T2": {
+      "kind": "near_miss",
+      "question": "What is the refund window in days for Giropay payments on Stripe?",
+      "verdict": "MANUAL",
+      "rules": 1,
+      "answer": "I could not find any code or config in the repository that states a refund window (in days) for Giropay payments on Stripe. The code does show that Giropay is enabled for Stripe in Germany (EUR), but there is no visible rule specifying a refund-window duration.",
+      "rule_texts": [
+        "Giropay is enabled on the Stripe connector for Germany with EUR currency."
+      ]
+    },
+    "H-T1": {
+      "kind": "trick",
+      "question": "Which countries does Hyperswitch block for sanctions reasons?",
+      "runs": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "verdict": "PASS"
+    },
+    "D-T1": {
+      "kind": "trick",
+      "question": "What minimum customer age is required to use Klarna on Stripe?",
+      "runs": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "verdict": "PASS"
+    },
+    "D-T3": {
+      "kind": "trick",
+      "question": "What cooling-off period applies to Afterpay payments in the UK?",
+      "runs": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "verdict": "PASS"
+    }
+  },
+  "summary": {
+    "answerable": {
+      "pass": 11,
+      "partial": 0,
+      "miss": 1,
+      "error": 0,
+      "run": 12,
+      "total": 12
+    },
+    "trick": {
+      "pass": 3,
+      "fail": 0,
+      "error": 0,
+      "run": 3,
+      "total": 3
+    },
+    "near_miss": {
+      "manual_review": 1,
+      "run": 1,
+      "total": 1
+    },
+    "unverified_citations": 0
+  }
+}

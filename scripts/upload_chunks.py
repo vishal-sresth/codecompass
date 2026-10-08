@@ -9,7 +9,7 @@ from pathlib import Path
 
 from common import ROOT, project_client
 
-CHUNKS = ROOT / "ingest" / "out" / "chunks"
+CHUNKS = ROOT / "ingest" / "out_v2" / "chunks"   # override with --chunks (the v4 index came from ingest/out/chunks)
 
 
 def pick_test_files():
@@ -28,21 +28,40 @@ def main():
     ap.add_argument("--name", required=True)
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--batch", type=int, default=100)
+    ap.add_argument("--chunks", default=None, help="chunk folder relative to the project root")
+    ap.add_argument("--concurrency", type=int, default=12, help="parallel file uploads inside each batch (SDK default is 5)")
+    ap.add_argument("--chunking", choices=["static", "auto"], default="static",
+                    help="static: ask the service to keep each of our chunk files whole (max 1200 tokens, no overlap); auto: service default (800/400)")
     args = ap.parse_args()
 
+    global CHUNKS
+    if args.chunks:
+        CHUNKS = ROOT / args.chunks
     files = pick_test_files() if args.test else sorted(CHUNKS.glob("*.txt"))
     print(f"uploading {len(files)} files to a new vector store '{args.name}'")
 
     oc = project_client().get_openai_client()
-    vs = oc.vector_stores.create(name=args.name)
-    print("vector store id:", vs.id)
+    strategy = {"type": "static", "static": {"max_chunk_size_tokens": 1200, "chunk_overlap_tokens": 0}}
+    used = "auto (service default)"
+    vs = None
+    if args.chunking == "static":
+        try:
+            vs = oc.vector_stores.create(name=args.name, chunking_strategy=strategy)
+            used = "static, 1200 tokens, no overlap"
+        except Exception as e:  # the setting may not be accepted on every deployment; nothing has been uploaded yet
+            print("static chunking was rejected, falling back to the default:", str(e)[:160])
+    if vs is None:
+        strategy = None
+        vs = oc.vector_stores.create(name=args.name)
+    print("vector store id:", vs.id, "| chunking:", used)
 
     t0 = time.time()
     for i in range(0, len(files), args.batch):
         part = files[i:i + args.batch]
         handles = [open(p, "rb") for p in part]
         try:
-            b = oc.vector_stores.file_batches.upload_and_poll(vector_store_id=vs.id, files=handles)
+            kwargs = {"chunking_strategy": strategy} if strategy else {}
+            b = oc.vector_stores.file_batches.upload_and_poll(vector_store_id=vs.id, files=handles, max_concurrency=args.concurrency, **kwargs)
         finally:
             for h in handles:
                 h.close()

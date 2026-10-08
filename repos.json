@@ -1,0 +1,26 @@
+{
+  "_comment": "Single source of truth for the indexed repos. Used by ingest/ingest.py, the citation checker and the server. Paths are relative to the project root. Recreate the clones with scripts/setup_repos.sh.",
+  "repos": [
+    {
+      "name": "hyperswitch",
+      "path": "hyperswitch",
+      "url": "https://github.com/juspay/hyperswitch.git",
+      "sha": "d03f8547d6367fab56690e4f5043590be4935dcd",
+      "license": "Apache-2.0",
+      "include": [
+        "config/development.toml",
+        "config/config.example.toml",
+        "config/deployments/production.toml",
+        "config/payment_required_fields_v2.toml"
+      ]
+    },
+    {
+      "name": "active_merchant",
+      "path": "repos/active_merchant",
+      "url": "https://github.com/activemerchant/active_merchant.git",
+      "sha": "ca45b1b063ce2e1495e1427e0a1d42dcb482d57d",
+      "license": "MIT",
+      "include": ["lib/active_merchant/billing/gateways/*.rb"]
+    }
+  ]
+}
